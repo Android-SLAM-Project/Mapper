@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PreprocessMap">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingTop="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose Map Starting Point"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingBottom="2dp"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Click on map to set starting point &amp; Move To Starting Point"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center" />
+
+        <ImageView
+            android:id="@+id/mapImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            tools:srcCompat="@drawable/new_map"
+            android:contentDescription="Map image" />
+
+        <Button
+            android:id="@+id/startButton"
+            style="@style/MyCustomButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text=" Start "
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/map_coordinates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" "
+            android:textSize="16sp"
+            android:visibility="invisible"
+            android:layout_marginTop="16dp"
+            android:gravity="center" />
+
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">imu_slam</string>
+<!--    &lt;!&ndash; TODO: Remove or change this placeholder text &ndash;&gt;-->
+<!--    <string name="hello_blank_fragment">Hello blank fragment</string>-->
+<!--    <string name="merged_map_image" />-->
+
+<!--        <string name="permission_title">Permissions Required</string>-->
+<!--    <string name="permission_title">Per</string>-->
+<!--        <string name="permission_message">This app requires permissions to function properly. Please enable all necessary permissions in Settings.</string>-->
+<!--        <string name="go_to_settings">Go to Settings</string>-->
+<!--        <string name="cancel">Cancel</string>-->
+<!--    <string name="load_previous_map">Load Previous Map</string>-->
+    <string name="coordinates">Coordinates</string>
+
+
+
+</resources>

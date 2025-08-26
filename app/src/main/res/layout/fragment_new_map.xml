@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".NewMap">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:paddingTop="24dp">
+
+        <!-- Top Text -->
+<!--        <TextView-->
+<!--            android:id="@+id/import_map_title"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Import New Map"-->
+<!--            android:textSize="20sp"-->
+<!--            android:textStyle="bold"-->
+<!--            android:paddingBottom="16dp"-->
+<!--            android:gravity="center" />-->
+
+
+        <!-- Instructions Text -->
+        <TextView
+            android:id="@+id/new_map_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Import Map Image and Define It's Parameters."
+            android:textSize="14sp"
+            android:paddingBottom="16dp"
+            android:gravity="center" />
+
+        <!-- Import Map Button -->
+        <Button
+            android:id="@+id/import_map_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Import Map"
+            android:padding="12dp"
+            style="@style/MyCustomButtonStyle"
+            android:layout_marginBottom="16dp"/>
+        <Button
+            android:id="@+id/resumeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Load Recent Map"
+            android:padding="12dp"
+            style="@style/MyCustomButtonStyle"
+            android:layout_marginBottom="16dp"/>
+<!--        <Button-->
+<!--            android:id="@+id/resumeButton"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@string/load_previous_map"-->
+<!--            />-->
+
+        <!-- Map Dimensions Text -->
+        <TextView
+            android:id="@+id/dimension_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Map Dimensions (in Meters)"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingBottom="12dp"
+            android:visibility="invisible"
+            android:gravity="center" />
+
+
+        <!-- Enter Map Height -->
+        <TextView
+            android:id="@+id/height_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Map's Height"
+            android:layout_marginBottom="8dp"
+            android:visibility="invisible"
+            android:gravity="center"/>
+
+        <!-- Height Input -->
+        <EditText
+            android:id="@+id/map_height"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:visibility="invisible"
+            android:textSize="12dp"
+            android:hint="Height"
+            android:inputType="number" />
+
+        <!-- Enter Map Width -->
+        <TextView
+            android:id="@+id/width_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Map's Width"
+            android:visibility="invisible"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"/>
+
+        <!-- Width Input -->
+        <EditText
+            android:id="@+id/map_width"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:visibility="invisible"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="12dp"
+            android:hint="Width"
+            android:inputType="number" />
+        <Button
+            android:id="@+id/map_pos_activity_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:visibility="invisible"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            style="@style/MyCustomButtonStyle"/>
+
+    </LinearLayout>
+</FrameLayout>

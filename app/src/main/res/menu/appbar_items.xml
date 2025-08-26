@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/import_new_map"
+        android:title="Import New Map"
+        android:icon="@drawable/new_map"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/settings"
+        android:title="Settings"
+        android:icon="@drawable/settings_icon"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/exit"
+        android:title="Exit"
+        android:icon="@drawable/exit_icon"
+        app:showAsAction="never" />
+</menu>

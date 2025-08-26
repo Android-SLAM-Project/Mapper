@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">imu_slam</string>
+<!--    <string name="hello_blank_fragment">a</string>-->
+<!--    <string name="merged_map_image">a</string>-->
+<!--    <string name="permission_title">a</string>-->
+<!--    <string name="permission_message">a</string>-->
+<!--    <string name="go_to_settings">a</string>-->
+<!--    <string name="cancel">a</string>-->
+<!--    <string name="load_previous_map">a</string>-->
+    <string name="coordinates">abc</string>
+</resources>

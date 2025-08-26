@@ -1,0 +1,23 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Imu_slam" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <item name="colorPrimary">#1a92a8</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:windowFullscreen">true</item>
+<!--        <item name="android:button">@style/MyCustomButtonStyle</item>-->
+    </style>
+    <style name="OverflowMenuStyle" parent="@android:style/Widget.ActionButton.Overflow">
+        <item name="android:tint">#FFFFFF</item> <!-- White Color -->
+    </style>
+    <style name="MyCustomButtonStyle" parent="Widget.MaterialComponents.Button">
+        <!-- Override only the text color -->
+        <item name="android:textColor">#ffffff</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.MaterialComponents.SmallComponent</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="textAllCaps">false</item>
+        <item name="elevation">10dp</item>
+        <item name="android:letterSpacing">0.05</item>
+        <!-- Keep all other properties as default -->
+    </style>
+</resources>

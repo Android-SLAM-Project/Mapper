@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/import_map"
+        android:icon="@drawable/new_map"
+        android:title="Import Map" />
+    <item
+        android:id="@+id/saved_map"
+        android:icon="@drawable/saved_map"
+        android:title="Saved Maps" />
+</menu>
