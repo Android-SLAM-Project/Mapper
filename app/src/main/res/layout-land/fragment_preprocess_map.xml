@@ -1,15 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center"
     tools:context=".PreprocessMap">
-    <LinearLayout
-        android:layout_width="match_parent"
+
+    <!-- Left side: Map inside FrameLayout so pointer overlay works -->
+
+    <FrameLayout
+        android:id="@+id/mapContainer"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingStart="15dp"
+        android:paddingEnd="5dp"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/mapImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:contentDescription="Map image"
+            android:scaleType="fitXY"
+            tools:srcCompat="@drawable/new_map" />
+
+    </FrameLayout>
+
+    <!-- Right side: Info + Controls -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:paddingTop="24dp">
+        android:padding="16dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -17,7 +43,7 @@
             android:text="@string/Choose_Map_Starting_Point"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:paddingBottom="2dp"
+            android:paddingBottom="8dp"
             android:gravity="center" />
 
         <TextView
@@ -25,24 +51,14 @@
             android:layout_height="wrap_content"
             android:text="@string/click_on_map_to_set_starting_point_move_to_starting_point"
             android:textSize="16sp"
-            android:paddingBottom="2dp"
-            android:layout_marginBottom="8dp"
+            android:paddingBottom="16dp"
             android:gravity="center" />
-
-        <ImageView
-            android:id="@+id/mapImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="fitXY"
-            tools:srcCompat="@drawable/new_map"
-            android:contentDescription="Map image" />
 
         <Button
             android:id="@+id/startButton"
             style="@style/MyCustomButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
             android:text="@string/Start"
             android:visibility="invisible" />
 
@@ -55,6 +71,6 @@
             android:visibility="invisible"
             android:layout_marginTop="16dp"
             android:gravity="center" />
-
     </LinearLayout>
-</FrameLayout>
+
+</LinearLayout>

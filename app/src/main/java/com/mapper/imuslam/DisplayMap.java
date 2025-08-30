@@ -6,7 +6,9 @@ import static android.view.View.VISIBLE;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
@@ -98,7 +100,16 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_map);
+        settings = Settings.getInstance();
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+        }
+
         View decorView = getWindow().getDecorView();
+
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         );
@@ -111,7 +122,6 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
 
         Toolbar appBar = findViewById(R.id.appbar);
         setSupportActionBar(appBar);
-        settings = Settings.getInstance();
         trailing = settings.getTrailingFlag();
         stepCounterManager = StepCounterManager.getInstance(this);
         stepCounterManager.resetSessionSteps();
@@ -135,7 +145,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
                 startX = Float.parseFloat(startXStr);
                 startY = Float.parseFloat(startYStr);
             } catch (Exception e) {
-                Toast.makeText(this, "Invalid map parameters", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.Invalid_map_parameters, Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         }
@@ -153,10 +163,19 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             mapFolder.mkdirs();
         }
 
-        int displayWidth = getResources().getDisplayMetrics().widthPixels;
-        int layoutWidth = displayWidth;
-        int layoutHeight = (int) ((displayWidth * mapHeight) / mapWidth);
-
+        int displayWidth = getResources().getDisplayMetrics().widthPixels-10;
+        int displayHeight= getResources().getDisplayMetrics().heightPixels-10;
+        boolean isLandscape = displayWidth > displayHeight;
+        int a = (int) (60 * this.getResources().getDisplayMetrics().density);
+        if(isLandscape){displayHeight=displayHeight-a;}
+        int layoutWidth,  layoutHeight;
+        if(isLandscape) {
+            layoutWidth  = (int) ((displayHeight * mapWidth) / mapHeight);
+            layoutHeight  = displayHeight;
+        }else {
+            layoutWidth  = displayWidth;
+            layoutHeight  = (int) ((displayWidth * mapHeight) / mapWidth);
+        }
         resetZoomButton = findViewById(R.id.resetZoomButton);
 
         rootLayout = findViewById(R.id.root_layout);
@@ -237,7 +256,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
     @Override
     public void onMapTapped(float touchX, float touchY) {
         if (isZoomed) {
-            Toast.makeText(this, "Please reset zoom before applying correction", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.Reset_zoom_before_correction, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -253,10 +272,10 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         float finalCorrectedMapX = correctedMapX;
         float finalCorrectedMapY = correctedMapY;
         new AlertDialog.Builder(DisplayMap.this)
-                .setTitle("Confirm Correction")
+                .setTitle(R.string.Confirm_Correction)
                 .setMessage(String.format(Locale.getDefault(),
-                        "Set pointer to X: %.2f, Y: %.2f?", correctedMapX, correctedMapY))
-                .setPositiveButton("Yes", (dialog, which) -> {
+                        R.string.Set_pointer_to+" X: %.2f, Y: %.2f?", correctedMapX, correctedMapY))
+                .setPositiveButton(R.string.Yes, (dialog, which) -> {
                     com.google.ar.core.Frame frame = arFragment.getArSceneView().getArFrame();
                     if (frame != null) {
                         Pose cameraPose = frame.getCamera().getPose();
@@ -287,7 +306,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
                         trailingLineView.addPoint(centerX, centerY);
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.Cancel, null)
                 .show();
     }
 
@@ -309,7 +328,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             if (mergedMapBitmap != null) {
                 saveBitmapAndMetrics(mergedMapBitmap);
             } else {
-                Toast.makeText(this, "Failed to capture merged map", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.Failed_to_capture_merged_map, Toast.LENGTH_SHORT).show();
             }
             Intent intent1 = new Intent(DisplayMap.this, BaseActivity.class);
             intent1.putExtra("fragmentToLoad", "savedMap");
@@ -325,7 +344,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             bitmapToSave.compress(Bitmap.CompressFormat.JPEG, 90, fos);
             Log.d(TAG, "Merged map saved at: " + mergedFile.getAbsolutePath());
         } catch (IOException e) {
-            Toast.makeText(this, "Error saving merged map: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.Error_saving_merged_map+" " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Error saving merged map", e);
         }
 
@@ -364,8 +383,8 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             if (stepsDistanceTextView == null) return;
             int steps = stepCounterManager.getSessionSteps();
             float distance = stepCounterManager.getDistanceMeters();
-            stepsDistanceTextView.setText(String.format(Locale.getDefault(),
-                    "Steps: %d, Distance: %.2f m", steps, distance));
+            String steps_distane_text=getString(R.string.steps_info, steps, distance);
+            stepsDistanceTextView.setText(steps_distane_text);
         });
     }
 
@@ -390,7 +409,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 launchCamera();
             } else {
-                Toast.makeText(this, "Camera permission is required to take photos", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.Camera_permission_required, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -472,7 +491,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             }
             updatePhotosMetadata(file.getName(), lastMapX, lastMapY, mapWidth, mapHeight);
         } catch (IOException e) {
-            Toast.makeText(this, "Error saving photo: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.Error_saving_photo+" " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Error saving photo", e);
         }
     }
@@ -494,7 +513,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             try (FileOutputStream fos = new FileOutputStream(jsonFile)) {
                 fos.write(jsonArray.toString().getBytes());
             }
-            Toast.makeText(this, "Metadata updated", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.Metadata_updated, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e(TAG, "Error updating metadata", e);
         }
@@ -562,15 +581,21 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         View dialogView = LayoutInflater.from(this).inflate(R.layout.settings, null);
         Switch switchOption = dialogView.findViewById(R.id.switch1);
         switchOption.setChecked(settings.getTrailingFlag());
+        Switch potraitMode = dialogView.findViewById(R.id.potrait_flag_switch);
+//        potraitMode.setChecked(settings.getPotraitFlag());
         new AlertDialog.Builder(this)
-                .setTitle("Settings")
+                .setTitle(R.string.Settings)
                 .setView(dialogView)
-                .setPositiveButton("OK", (dialog, which) -> {
+                .setPositiveButton(R.string.OK, (dialog, which) -> {
                     settings.setTrailing_flag(switchOption.isChecked());
                     trailing = settings.getTrailingFlag();
-                    Toast.makeText(this, "Trailing is " + (trailing ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+//                    String ScreenMode=potraitMode.isChecked()?"Potraint Mode":"Landscape Mode";
+//                    if(settings.getPotraitFlag()!=potraitMode.isChecked()) {
+//                        Toast.makeText(this, "Cannot Switch To" + ScreenMode, Toast.LENGTH_SHORT).show();
+//                    }
+                    Toast.makeText(this, R.string.Trailing_is+" " + (trailing ? R.string.ON : R.string.OFF), Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.Cancel, null)
                 .show();
     }
 
@@ -586,14 +611,21 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         new CountDownTimer(5000, 100) {
             @SuppressLint("SetTextI18n")
             public void onTick(long millisUntilFinished) {
-                dialogTimerText.setText("Please Move your Device for " +
-                        String.format(Locale.getDefault(), "%.1f", millisUntilFinished / 1000.0) + " Seconds");
+                dialogTimerText.setText(
+                        String.format(
+                                Locale.getDefault(),
+                                "%s %.1f %s",
+                                getString(R.string.Please_Move_your_Device_for),
+                                millisUntilFinished / 1000.0,
+                                getString(R.string.Seconds)
+                        )
+                );
             }
             public void onFinish() {
                 dialog.dismiss();
-                Toast.makeText(DisplayMap.this, "Calibration Success", Toast.LENGTH_SHORT).show();
+                Toast.makeText(DisplayMap.this, R.string.Calibration_Success, Toast.LENGTH_SHORT).show();
                 TextView mainTimerText = findViewById(R.id.timer);
-                mainTimerText.setText(String.format(Locale.getDefault(), "Scale : %s X %s", mapHeightStr, mapWidthStr));
+                mainTimerText.setText(String.format(Locale.getDefault(), "%s : %s X %s", getString(R.string.Scale), mapHeightStr, mapWidthStr));
                 mainTimerText.setVisibility(VISIBLE);
             }
         }.start();
@@ -603,14 +635,15 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
 
     private void confirmExit() {
         new AlertDialog.Builder(this)
-                .setMessage("All progress will be gone if not saved. Are you sure you want to exit?")
-                .setPositiveButton("Yes", (dialog, which) -> finishAffinity())
-                .setNegativeButton("No", null)
+                .setMessage(R.string.All_progress_will_be_gone)
+                .setPositiveButton(R.string.Yes, (dialog, which) -> finishAffinity())
+                .setNegativeButton(R.string.No, null)
                 .show();
     }
 
     @Override
     public void onBackPressed(){
         confirmExit();
+
     }
 }

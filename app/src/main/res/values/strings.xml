@@ -1,17 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">imu_slam</string>
-<!--    &lt;!&ndash; TODO: Remove or change this placeholder text &ndash;&gt;-->
-<!--    <string name="hello_blank_fragment">Hello blank fragment</string>-->
-<!--    <string name="merged_map_image" />-->
-
-<!--        <string name="permission_title">Permissions Required</string>-->
-<!--    <string name="permission_title">Per</string>-->
-<!--        <string name="permission_message">This app requires permissions to function properly. Please enable all necessary permissions in Settings.</string>-->
-<!--        <string name="go_to_settings">Go to Settings</string>-->
-<!--        <string name="cancel">Cancel</string>-->
-<!--    <string name="load_previous_map">Load Previous Map</string>-->
+    <string name="app_name">Mapper</string>
     <string name="coordinates">Coordinates</string>
+    <string name="Total_Distance">Total Distance</string>
+    <string name="End_Map">End Map</string>
+    <string name="Reset_Zoom">Reset Zoom</string>
+    <string name="Please_Move_your_Device">Please Move your Device</string>
+    <string name="Import_Map">Import Map</string>
+    <string name="Saved_Maps">Saved Maps</string>
+    <string name="Loading">Loading</string>
+    <string name="Calibrating_Sensors">Calibrating Sensors</string>
+    <string name="Click_Photo">Click Photo</string>
+    <string name="Import_Map_Image_and_Define_Its_Parameters">Import Map Image and Define It\'s Parameters.</string>
+    <string name="Load_Recent_Map">Load Recent Map</string>
+    <string name="Enter_Map_Dimensions_in_Meters">Enter Map Dimensions (in Meters)</string>
+    <string name="Enter_Maps_Height">Enter Map\'s Height</string>
+    <string name="Enter_Maps_Width">Enter Map\'s Width</string>
+    <string name="Next">Next</string>
+    <string name="Choose_Map_Starting_Point">Choose Map Starting Point</string>
+    <string name="click_on_map_to_set_starting_point_move_to_starting_point">Click on map to set starting point &amp; Move To Starting Point</string>
+    <string name="Start">Start</string>
+    <string name="Steps">Steps</string>
+    <string name="Distance">Distance</string>
+    <string name="steps_info">Steps: %1$d, Distance: %2$.1fm</string>
+    <string name="Trailing">Trailing</string>
+    <string name="step_length">Step length (in meters)</string>
+    <string name="Enter_Constant_Value">Enter constant value</string>
+    <string name="Map_Data">Map Data</string>
 
+    <string name="Import_new_Map">Import New Map</string>
+    <string name="Settings">Settings</string>
+    <string name="Exit">Exit</string>
+    <string name="Height">Height</string>
+    <string name="Width">Width</string>
+        <string name="Starting_please_wait">Starting, please wait...</string>
+        <string name="Calibration_success">Calibration successful</string>
+        <string name="Scale">Scale</string>
+        <string name="Ending_map_session">Ending map session</string>
+        <string name="SLAM_MAP">SLAM Map</string>
+        <string name="All_progress_will_be_gone">All progress will be lost. Do you want to continue?</string>
+        <string name="Yes">Yes</string>
+        <string name="No">No</string>
+        <string name="Error_loading_saved_map_metrics">Error loading saved map metrics</string>
+        <string name="No_map_folder_provided">No map folder provided</string>
+        <string name="Map_folder_not_found">Map folder not found</string>
+        <string name="No_files_in_folder">No files in folder</string>
+        <string name="Failed_to_decode_photo">Failed to decode photo</string>
+        <string name="Storage_permission_denied">Storage permission denied</string>
+        <string name="Image_loading_failed">Image loading failed</string>
+        <string name="Image_loaded_successfully">Image loaded successfully</string>
+        <string name="And">and</string>
+        <string name="Enter_map_height">Enter map height</string>
+        <string name="Please">Please</string>
+        <string name="Select_an_image">Select an image</string>
+        <string name="Enter_map_width">Enter map width</string>
+        <string name="Need_storage_access">We need storage access to import your map image</string>
+        <string name="Exit_confirmation">Are you sure you want to exit?</string>
+
+        <string name="Please_Move_your_Device_for">Please Move your Device for</string>
+        <string name="Seconds">Seconds</string>
+        <string name="Calibration_Success">Calibration Success</string>
+        <string name="Trailing_is">Trailing is</string>
+        <string name="ON">ON</string>
+        <string name="OFF">OFF</string>
+        <string name="Metadata_updated">Metadata updated</string>
+        <string name="Error_saving_photo">Error saving photo:</string>
+        <string name="Camera_permission_required">Camera permission is required to take photos</string>
+        <string name="Error_saving_merged_map">Error saving merged map:</string>
+        <string name="Failed_to_capture_merged_map">Failed to capture merged map</string>
+
+        <string name="Confirm_Correction">Confirm Correction</string>
+        <string name="Set_pointer_to">Set pointer to</string>
+        <string name="Cancel">Cancel</string>
+        <string name="Reset_zoom_before_correction">Please reset zoom before applying correction</string>
+        <string name="Invalid_map_parameters">Invalid map parameters</string>
+        <string name="OK">OK</string>
+    <string name="Potrait_mode">Potrait Mode</string>
 
 
 </resources>

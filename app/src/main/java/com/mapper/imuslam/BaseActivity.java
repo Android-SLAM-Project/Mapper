@@ -39,7 +39,10 @@ public class BaseActivity extends AppCompatActivity {
         // Enable edge-to-edge by letting us handle insets manually.
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_base); // Ensure this matches your layout file
+        setContentView(R.layout.activity_base);
+        settings = Settings.getInstance();
+//        settings.applyOrientation(this);
+        // Ensure this matches your layout file
 //        LogManager.initialize(this);
         // Request necessary permissions at runtime
         requestPermissionsIfNecessary();
@@ -49,7 +52,7 @@ public class BaseActivity extends AppCompatActivity {
                 View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         );
         String fragmentToLoad = getIntent().getStringExtra("fragmentToLoad");
-        settings = Settings.getInstance();
+
 
         // Set up the AppBar (Toolbar)
         Toolbar appBar = findViewById(R.id.appbar);
@@ -109,6 +112,8 @@ public class BaseActivity extends AppCompatActivity {
 //        super.onActivityResult(requestCode, resultCode, data);
 //        LogManager.handleActivityResult(this, requestCode, resultCode, data); // SAF handling
 //    }
+
+
 
     /**
      * Checks and requests necessary permissions based on the device's API level.
@@ -231,20 +236,26 @@ public class BaseActivity extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.settings, null);
         Switch switchOption = dialogView.findViewById(R.id.switch1);
+        Switch potraitFlagSwitch = dialogView.findViewById(R.id.potrait_flag_switch);
+
         EditText constantEditText = dialogView.findViewById(R.id.editTextConstant);
         switchOption.setChecked(settings.getTrailingFlag());
+//        potraitFlagSwitch.setChecked(settings.getPotraitFlag());
         constantEditText.setText(String.valueOf(settings.getConstant()));
         new AlertDialog.Builder(this)
                 .setTitle("Settings")
                 .setView(dialogView)
                 .setPositiveButton("OK", (dialog, which) -> {
                     settings.setTrailing_flag(switchOption.isChecked());
+//                    settings.setPotraitFlag(potraitFlagSwitch.isChecked());
                     try {
                         float newConstant = Float.parseFloat(constantEditText.getText().toString());
                         settings.setConstant(newConstant);
                     } catch (NumberFormatException e) {
                         Toast.makeText(this, "Invalid constant value", Toast.LENGTH_SHORT).show();
                     }
+//                    settings.applyOrientation(this);
+//                    recreate();
                     Toast.makeText(this, "Settings updated", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)

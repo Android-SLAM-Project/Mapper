@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+
         // Start logging immediately into app‑specific storage
         LogManager.initialize(this);
 

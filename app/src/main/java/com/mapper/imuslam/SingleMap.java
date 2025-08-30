@@ -99,22 +99,22 @@ public class SingleMap extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (folderPath == null) {
-            Toast.makeText(getContext(), "No map folder provided", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.No_map_folder_provided, Toast.LENGTH_SHORT).show();
             return;
         }
         File folder = new File(folderPath);
         if (!folder.exists() || !folder.isDirectory()) {
-            Toast.makeText(getContext(), "Map folder not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.Map_folder_not_found, Toast.LENGTH_SHORT).show();
             return;
         }
 
         // List and log all files in the folder for diagnostics.
         File[] files = folder.listFiles();
         if (files == null || files.length == 0) {
-            Toast.makeText(getContext(), "No files in folder", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.No_files_in_folder, Toast.LENGTH_SHORT).show();
             return;
         }
-        Log.d(TAG, "Files in folder (" + folder.getAbsolutePath() + "):");
+        Log.d(TAG, "Files in folder"+" (" + folder.getAbsolutePath() + "):");
         for (File f : files) {
             Log.d(TAG, "   " + f.getName());
         }
@@ -490,7 +490,7 @@ public class SingleMap extends Fragment {
                                 .show();
                         return;
                     } else {
-                        Toast.makeText(getContext(), "Failed to decode photo", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.Failed_to_decode_photo, Toast.LENGTH_SHORT).show();
                     }
                 }
             }

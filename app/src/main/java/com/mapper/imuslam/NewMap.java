@@ -73,7 +73,7 @@ public class NewMap extends Fragment {
         loadPreviousMapButton= v.findViewById(R.id.resumeButton);
 
         // hide inputs until image picked
-        setFieldsVisibility(INVISIBLE);
+        setFieldsVisibility(GONE);
         setupBackPressed();
 
         // --- RESUME FLOW ---
@@ -111,7 +111,7 @@ public class NewMap extends Fragment {
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(getContext(),
-                                "Error loading saved map metrics", Toast.LENGTH_SHORT).show();
+                                R.string.Error_loading_saved_map_metrics, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -125,7 +125,7 @@ public class NewMap extends Fragment {
                         granted -> {
                             if (!granted) {
                                 Toast.makeText(getContext(),
-                                        "Storage permission denied", Toast.LENGTH_SHORT).show();
+                                        R.string.Storage_permission_denied, Toast.LENGTH_SHORT).show();
                             }
                         }
                 );
@@ -154,11 +154,11 @@ public class NewMap extends Fragment {
                                     loadPreviousMapButton.setVisibility(GONE);
 
                                     Toast.makeText(getContext(),
-                                            "Image Loaded Successfully", Toast.LENGTH_SHORT).show();
+                                            R.string.Image_loaded_successfully, Toast.LENGTH_SHORT).show();
                                 }
                             } else {
                                 Toast.makeText(getContext(),
-                                        "Image Loading Failed", Toast.LENGTH_SHORT).show();
+                                        R.string.Image_loading_failed, Toast.LENGTH_SHORT).show();
                             }
                         }
                 );
@@ -186,17 +186,24 @@ public class NewMap extends Fragment {
                         .commit();
 
             } else {
-                StringBuilder msg = new StringBuilder("Please ");
-                if (!ImageSelected) msg.append("select an image ");
+                StringBuilder msg = new StringBuilder(getString(R.string.Please) + " ");
+
+                if (!ImageSelected) {
+                    msg.append(getString(R.string.Select_an_image)).append(" ");
+                }
+
                 if (MapHeight.getText().toString().isEmpty()) {
-                    if (!ImageSelected) msg.append("and ");
-                    msg.append("enter map height ");
+                    if (!ImageSelected) msg.append(getString(R.string.And)).append(" ");
+                    msg.append(getString(R.string.Enter_map_height)).append(" ");
                 }
+
                 if (MapWidth.getText().toString().isEmpty()) {
-                    if (!ImageSelected || MapHeight.getText().toString().isEmpty())
-                        msg.append("and ");
-                    msg.append("enter map width");
+                    if (!ImageSelected || MapHeight.getText().toString().isEmpty()) {
+                        msg.append(getString(R.string.And)).append(" ");
+                    }
+                    msg.append(getString(R.string.Enter_map_width));
                 }
+
                 Toast.makeText(getContext(), msg.toString(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -216,7 +223,7 @@ public class NewMap extends Fragment {
                 requireContext(), perm) != PackageManager.PERMISSION_GRANTED) {
             if (shouldShowRequestPermissionRationale(perm)) {
                 Toast.makeText(getContext(),
-                        "We need storage access to import your map image",
+                        R.string.Need_storage_access,
                         Toast.LENGTH_LONG).show();
             }
             permLauncher.launch(perm);
@@ -247,9 +254,9 @@ public class NewMap extends Fragment {
                     @Override
                     public void handleOnBackPressed() {
                         new AlertDialog.Builder(getContext())
-                                .setMessage("Are you sure you want to exit?")
-                                .setPositiveButton("Yes", (d, w) -> requireActivity().finish())
-                                .setNegativeButton("No", null)
+                                .setMessage(R.string.Exit_confirmation)
+                                .setPositiveButton(R.string.Yes, (d, w) -> requireActivity().finish())
+                                .setNegativeButton(R.string.No, null)
                                 .show();
                     }
                 }

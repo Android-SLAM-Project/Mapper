@@ -33,6 +33,7 @@ public class PreprocessMap extends Fragment {
     private String mapHeight, mapWidth, imageUri;
     private TextView mapCoordinates;
     private ImageView previewImage;
+    Settings settings;
     private Button StartButton;
     private View pointerView;
     private FrameLayout mapContainer;
@@ -115,12 +116,29 @@ public class PreprocessMap extends Fragment {
         int displayHeight = getResources().getDisplayMetrics().heightPixels - 10;
         int displayWidth = getResources().getDisplayMetrics().widthPixels - 10;
         int layoutWidth, layoutHeight;
+        boolean isLandscape = displayWidth > displayHeight;
+        int a = (int) (100 * this.getResources().getDisplayMetrics().density);
+        if(isLandscape){displayHeight=displayHeight-a;}
         if (mapW > mapH) {
-            layoutWidth = displayWidth;
-            layoutHeight = (int) ((displayWidth * mapH) / (float) mapW);
+            if (isLandscape) {
+                // fit to height in landscape
+                layoutHeight = displayHeight;
+                layoutWidth = (int) ((displayHeight * mapW) / (float) mapH);
+            } else {
+                // fit to width in portrait
+                layoutWidth = displayWidth;
+                layoutHeight = (int) ((displayWidth * mapH) / (float) mapW);
+            }
         } else {
-            layoutHeight = displayWidth;
-            layoutWidth = (int) ((displayWidth * mapW) / (float) mapH);
+            if (isLandscape) {
+                // fit to height in landscape
+                layoutHeight = displayHeight;
+                layoutWidth = (int) ((displayHeight * mapW) / (float) mapH);
+            } else {
+                // fit to width in portrait
+                layoutWidth = displayWidth;
+                layoutHeight = (int) ((displayWidth * mapH) / (float) mapW);
+            }
         }
         layoutWidth = Math.min(layoutWidth, displayWidth);
         layoutHeight = Math.min(layoutHeight, displayWidth);
