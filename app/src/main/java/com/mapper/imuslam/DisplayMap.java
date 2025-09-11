@@ -581,7 +581,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         View dialogView = LayoutInflater.from(this).inflate(R.layout.settings, null);
         Switch switchOption = dialogView.findViewById(R.id.switch1);
         switchOption.setChecked(settings.getTrailingFlag());
-        Switch potraitMode = dialogView.findViewById(R.id.potrait_flag_switch);
+//        Switch potraitMode = dialogView.findViewById(R.id.potrait_flag_switch);
 //        potraitMode.setChecked(settings.getPotraitFlag());
         new AlertDialog.Builder(this)
                 .setTitle(R.string.Settings)

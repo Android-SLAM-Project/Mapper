@@ -236,7 +236,7 @@ public class BaseActivity extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.settings, null);
         Switch switchOption = dialogView.findViewById(R.id.switch1);
-        Switch potraitFlagSwitch = dialogView.findViewById(R.id.potrait_flag_switch);
+//        Switch potraitFlagSwitch = dialogView.findViewById(R.id.potrait_flag_switch);
 
         EditText constantEditText = dialogView.findViewById(R.id.editTextConstant);
         switchOption.setChecked(settings.getTrailingFlag());
