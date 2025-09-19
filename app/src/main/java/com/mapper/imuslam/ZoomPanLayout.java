@@ -16,7 +16,7 @@ public class ZoomPanLayout extends FrameLayout {
     private float scaleFactor = 1.0f;
     private final float minScaleFactor = 1.0f;
     private final float maxScaleFactor = 7.0f;
-
+    boolean zoomEnabled = true;
     private ScaleGestureDetector scaleDetector;
     private GestureDetector gestureDetector;
 
@@ -28,6 +28,7 @@ public class ZoomPanLayout extends FrameLayout {
     public interface OnZoomPanListener {
         void onZoomOrPan();
     }
+
     private OnZoomPanListener zoomPanListener;
 
 
@@ -53,10 +54,18 @@ public class ZoomPanLayout extends FrameLayout {
     public void setOnZoomPanListener(OnZoomPanListener listener) {
         this.zoomPanListener = listener;
     }
+    public void setZoomEnabled(boolean enabled) {
+        this.zoomEnabled = enabled;
+    }
 
+    /** Public getter */
+    public boolean isZoomEnabled() {
+        return zoomEnabled;
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         boolean handled = scaleDetector.onTouchEvent(event);
         handled = gestureDetector.onTouchEvent(event) || handled;
         return handled || super.onTouchEvent(event);
@@ -73,6 +82,10 @@ public class ZoomPanLayout extends FrameLayout {
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
+            if (!zoomEnabled) {
+                // ignore zoom gestures completely
+                return true;
+            }
             scaleFactor *= detector.getScaleFactor();
             scaleFactor = Math.max(minScaleFactor, Math.min(scaleFactor, maxScaleFactor));
             setScaleX(scaleFactor);
@@ -88,6 +101,7 @@ public class ZoomPanLayout extends FrameLayout {
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
+            if (!zoomEnabled) return false;
             setTranslationX(getTranslationX() - distanceX);
             setTranslationY(getTranslationY() - distanceY);
 
@@ -99,6 +113,10 @@ public class ZoomPanLayout extends FrameLayout {
 
         @Override
         public boolean onDoubleTap(@NonNull MotionEvent e) {
+            if (!zoomEnabled) {
+                // block double-tap reset if zoom disabled
+                return true;
+            }
             resetZoom();
             Toast.makeText(getContext(), "View Reset", Toast.LENGTH_SHORT).show();
             return true;
@@ -106,6 +124,7 @@ public class ZoomPanLayout extends FrameLayout {
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
+
             if (mapTappedListener != null) {
                 float touchX = (e.getX() - getTranslationX()) / getScaleX();
                 float touchY = (e.getY() - getTranslationY()) / getScaleY();

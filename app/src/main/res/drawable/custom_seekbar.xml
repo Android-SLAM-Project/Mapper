@@ -1,0 +1,19 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Background track -->
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <size android:height="8dp"/> <!-- track thickness -->
+            <solid android:color="#BDBDBD"/> <!-- grey inactive -->
+        </shape>
+    </item>
+
+    <!-- Progress (filled) track -->
+    <item android:id="@android:id/progress">
+        <shape android:shape="rectangle">
+            <size android:height="8dp"/> <!-- track thickness -->
+            <solid android:color="#000000"/> <!-- black active -->
+        </shape>
+    </item>
+
+</layer-list>

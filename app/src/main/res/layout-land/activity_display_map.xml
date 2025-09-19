@@ -6,7 +6,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".DisplayMap">
-
+    <FrameLayout
+        android:id="@+id/ar_fragment_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
     <!-- Top AppBar -->
     <include
         android:id="@+id/appbar"
@@ -46,79 +50,543 @@
             </com.mapper.imuslam.ZoomPanLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Right side: Controls -->
-        <LinearLayout
+        <!-- Right side: controls with overlay -->
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="8dp">
+            android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/coordinates"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/coordinates"
-                android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/stepsDistanceTextView"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/calinrating_Sensors"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/Total_Distance"
-                android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/clickPhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/Click_Photo"
-                style="@style/MyCustomButtonStyle"
-                android:layout_marginTop="16dp" />
-
-            <Button
-                android:id="@+id/endMap"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/MyCustomButtonStyle"
-                android:layout_marginTop="8dp"
-                android:text="@string/End_Map" />
-
-            <Button
-                android:id="@+id/resetZoomButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                style="@style/MyCustomButtonStyle"
-                android:text="@string/Reset_Zoom"
+                android:orientation="vertical"
+                android:gravity="center"
                 android:visibility="gone"
-                tools:visibility="visible" />
+                android:padding="24dp"
+                android:background="#F5F5F5">
 
-            <TextView
-                android:id="@+id/timer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:text="@string/Please_Move_your_Device"
-                android:visibility="visible" />
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/titleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:gravity="center"
+                    android:text="Calibrating Sensors"
+                    android:textColor="#222"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/gifImageView"
+                <!-- Subtitle -->
+                <TextView
+                    android:id="@+id/subtitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center"
+                    android:text="Please keep your phone steady"
+                    android:textColor="#555"
+                    android:textSize="16sp" />
+
+                <!-- Circular progress with timer inside -->
+                <FrameLayout
+                    android:layout_width="180dp"
+                    android:layout_height="180dp">
+
+                    <!-- Circular progress bar -->
+                    <ProgressBar
+                        android:id="@+id/circleProgress"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:indeterminate="false"
+                        android:max="5000"
+                        android:progress="0"
+                        android:rotation="-90"
+                        android:progressDrawable="@drawable/circle_progress_drawable"/>
+
+                    <!-- Countdown text -->
+                    <TextView
+                        android:id="@+id/timerText"
+                        android:layout_width="match_parent"
+                        android:layout_height="166dp"
+                        android:gravity="center"
+                        android:text="5.00 s"
+                        android:textColor="#00838F"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/path_Calibration"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="10dp"
-                android:contentDescription="Calibration animation" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="24dp"
+                android:visibility="gone"
+                android:background="#F5F5F5">
 
-            <FrameLayout
-                android:id="@+id/ar_fragment_container"
+                <TextView
+                    android:id="@+id/titleText2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:gravity="center"
+                    android:text="Calibrating Path"
+                    android:textColor="#222"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <!-- Subtitle -->
+                <TextView
+                    android:id="@+id/subtitleText2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center"
+                    android:text="Please walk for at least 15 steps"
+                    android:textColor="#555"
+                    android:textSize="16sp" />
+
+                <!-- Circular progress with step count inside -->
+                <FrameLayout
+                    android:layout_width="180dp"
+                    android:layout_height="180dp">
+
+                    <ProgressBar
+                        android:id="@+id/stepProgress"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:indeterminate="false"
+                        android:max="15"
+                        android:progress="0"
+                        android:rotation="-90"
+                        android:progressDrawable="@drawable/circle_progress_drawable"/>
+
+                    <TextView
+                        android:id="@+id/stepCountText"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="#00838F"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/main_menu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:gravity="center">
+
+                <!-- X Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/new_map"
+                            app:tint="?attr/colorPrimary"
+                            android:contentDescription=""/>
+
+                        <TextView
+                            android:id="@+id/xTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="Coordinates"
+                            android:textSize="11sp"
+                            android:singleLine="true"/>
+
+                        <TextView
+                            android:id="@+id/CoordinatesTXT"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.0"
+                            android:textSize="11sp"
+                            android:singleLine="true"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Y Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/foot"
+                            app:tint="?attr/colorPrimary"/>
+
+                        <TextView
+                            android:id="@+id/yTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="Steps"
+                            android:textSize="11sp"
+                            android:singleLine="true"/>
+
+                        <TextView
+                            android:id="@+id/steps_TXT"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="11sp"
+                            android:singleLine="true"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Steps/Distance Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/distance"
+                            app:tint="?attr/colorPrimary"/>
+
+                        <TextView
+                            android:id="@+id/stepsTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="Distance"
+                            android:textSize="11sp"
+                            android:singleLine="true"/>
+
+                        <TextView
+                            android:id="@+id/distanceTXT"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 m"
+                            android:textSize="11sp"
+                            android:singleLine="true"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/resetZoom_card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.8"
+                        android:visibility="gone"
+                        android:layout_margin="8dp"
+                        app:cardBackgroundColor="?attr/colorPrimary"
+                        app:cardUseCompatPadding="true"
+                        app:cardPreventCornerOverlap="true"
+                        app:cardCornerRadius="16dp"
+                        android:clickable="true"
+                        app:cardElevation="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:src="@drawable/zoom_reset"
+                                android:contentDescription=""
+                                app:tint="@color/colorOnPrimary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/Reset_Zoom"
+                                android:singleLine="true"
+                                android:textSize="11sp"
+                                android:textColor="@color/colorOnPrimary"
+                                android:layout_marginTop="4dp"/>
+
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/AddPhoto_card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="8dp"
+                        app:cardBackgroundColor="?attr/colorPrimary"
+                        app:cardUseCompatPadding="true"
+                        app:cardPreventCornerOverlap="true"
+                        app:cardCornerRadius="16dp"
+                        android:clickable="true"
+                        app:cardElevation="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/add_photo"
+                                android:contentDescription=""
+                                app:tint="@color/colorOnPrimary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Add Photo"
+                                android:singleLine="true"
+                                android:textSize="11sp"
+                                android:textColor="@color/colorOnPrimary"
+                                />
+
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/endMap_card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="8dp"
+                        app:cardBackgroundColor="?attr/colorPrimary"
+                        app:cardUseCompatPadding="true"
+                        app:cardPreventCornerOverlap="true"
+                        app:cardCornerRadius="16dp"
+                        android:clickable="true"
+                        app:cardElevation="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/exit"
+                                android:contentDescription=""
+                                app:tint="@color/colorOnPrimary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/End_Map"
+                                android:singleLine="true"
+                                android:textSize="11sp"
+                                android:textColor="@color/colorOnPrimary"
+                                />
+
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+
+
+        </FrameLayout>
+
+
+
     </LinearLayout>
 </LinearLayout>
+
+
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:orientation="vertical"-->
+<!--    tools:context=".DisplayMap">-->
+
+<!--    &lt;!&ndash; Top AppBar &ndash;&gt;-->
+<!--    <include-->
+<!--        android:id="@+id/appbar"-->
+<!--        layout="@layout/appbar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="50dp" />-->
+
+<!--    &lt;!&ndash; Main content: horizontal split &ndash;&gt;-->
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="1"-->
+<!--        android:orientation="horizontal">-->
+
+<!--        &lt;!&ndash; Left side: Map View &ndash;&gt;-->
+<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--            android:id="@+id/constraint_map"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="2"-->
+<!--            android:padding="5dp"-->
+<!--            app:layout_constraintDimensionRatio="1:1">-->
+
+<!--            <com.mapper.imuslam.ZoomPanLayout-->
+<!--                android:id="@+id/root_layout"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:clipChildren="false">-->
+
+<!--                <ImageView-->
+<!--                    android:id="@+id/mapView"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:contentDescription="Map image"-->
+<!--                    android:scaleType="fitXY"-->
+<!--                    tools:srcCompat="@drawable/new_map" />-->
+<!--            </com.mapper.imuslam.ZoomPanLayout>-->
+<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+<!--        &lt;!&ndash; Right side: Controls &ndash;&gt;-->
+<!--        <LinearLayout-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="1"-->
+<!--            android:orientation="vertical"-->
+<!--            android:gravity="center_horizontal"-->
+<!--            android:padding="8dp">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/coordinates"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/coordinates"-->
+<!--                android:textSize="16sp" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/stepsDistanceTextView"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:text="@string/Total_Distance"-->
+<!--                android:textSize="16sp" />-->
+
+<!--            <Button-->
+<!--                android:id="@+id/clickPhoto"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/Click_Photo"-->
+<!--                style="@style/MyCustomButtonStyle"-->
+<!--                android:layout_marginTop="16dp" />-->
+
+<!--            <Button-->
+<!--                android:id="@+id/endMap"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                style="@style/MyCustomButtonStyle"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:text="@string/End_Map" />-->
+<!--&lt;!&ndash;            <Button&ndash;&gt;-->
+<!--&lt;!&ndash;                android:id="@+id/pathCorrectionbtn"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_width="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;                style="@style/MyCustomButtonStyle"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_marginTop="8dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:text="@string/apply_path_correction"&ndash;&gt;-->
+<!--&lt;!&ndash;                />&ndash;&gt;-->
+
+<!--            <Button-->
+<!--                android:id="@+id/resetZoomButton"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                style="@style/MyCustomButtonStyle"-->
+<!--                android:text="@string/Reset_Zoom"-->
+<!--                android:visibility="gone"-->
+<!--                tools:visibility="visible" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/timer"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="5dp"-->
+<!--                android:layout_marginBottom="5dp"-->
+<!--                android:text="@string/Please_Move_your_Device"-->
+<!--                android:visibility="visible" />-->
+
+<!--            <ImageView-->
+<!--                android:id="@+id/gifImageView"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="100dp"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:layout_marginBottom="10dp"-->
+<!--                android:contentDescription="Calibration animation" />-->
+
+<!--            <FrameLayout-->
+<!--                android:id="@+id/ar_fragment_container"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:visibility="gone" />-->
+<!--        </LinearLayout>-->
+<!--    </LinearLayout>-->
+<!--</LinearLayout>-->

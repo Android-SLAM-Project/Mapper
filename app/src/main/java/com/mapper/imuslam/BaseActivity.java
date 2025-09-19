@@ -5,10 +5,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -28,10 +31,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class BaseActivity extends AppCompatActivity {
     private Fragment currentFragment;
     Settings settings;
+    BottomNavigationView navBar;
     private static final int PERMISSION_REQUEST_CODE = 100;
 
     @Override
@@ -60,7 +65,7 @@ public class BaseActivity extends AppCompatActivity {
         String mapFolderPath = getIntent().getStringExtra("mapFolderPath");
 
 // Handle resume navigation AFTER initializing navBar
-        BottomNavigationView navBar = findViewById(R.id.navBar);
+         navBar = findViewById(R.id.navBar);
         if ("preprocessSavedMap".equals(fragmentToLoad)) {
             PreprocessMap fragment = new PreprocessMap();
             Bundle args = new Bundle();
@@ -73,15 +78,15 @@ public class BaseActivity extends AppCompatActivity {
         // Set up the BottomNavigationView (NavBar)
         navBar.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.import_map) {
-                if (currentFragment instanceof SavedMap) {
-                    confirmSwitchToImportMap();
-                } else {
+//                if (currentFragment instanceof SavedMap) {
+//                    confirmSwitchToImportMap();
+//                } else {
                     loadFragment(new NewMap());
-                }
+//                }
                 return true;
             }
             if (item.getItemId() == R.id.saved_map) {
-                if (currentFragment instanceof NewMap) {
+                if (currentFragment instanceof PreprocessMap || currentFragment instanceof NewMap) {
                     confirmSwitchToSavedMap();
                 } else {
                     loadFragment(new SavedMap());
@@ -130,7 +135,9 @@ public class BaseActivity extends AppCompatActivity {
         // Activity recognition permission.
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
                 != PackageManager.PERMISSION_GRANTED) {
-            permissionsToRequest.add(Manifest.permission.ACTIVITY_RECOGNITION);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                permissionsToRequest.add(Manifest.permission.ACTIVITY_RECOGNITION);
+            }
         }
 
         // For Android 13 (API 33) and above, request READ_MEDIA_IMAGES.
@@ -185,19 +192,61 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void confirmSwitchToSavedMap() {
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setMessage("All progress will be gone. Are you sure you want to continue?")
-                .setPositiveButton("Yes", (dialog, which) -> loadFragment(new SavedMap()))
-                .setNegativeButton("No", null)
-                .show();
+                .setPositiveButton("Yes", (d, which) -> loadFragment(new SavedMap()))
+                .setNegativeButton("No", (d, which) -> {
+                    // user cancelled -> restore previous selection
+                    navBar.setSelectedItemId(R.id.import_map);
+                })
+                .setOnCancelListener(d -> {
+                    // user cancelled -> restore previous selection
+                    navBar.setSelectedItemId(R.id.import_map);
+                })
+                .create();
+
+        // Make the background rounded + semi-transparent
+        dialog.setOnShowListener(d -> {
+            Window window = dialog.getWindow();
+            if (window != null) {
+                DisplayMetrics dm = getResources().getDisplayMetrics();
+                int width = (int) (dm.widthPixels * 0.80); // 80% of screen width
+                int height = WindowManager.LayoutParams.WRAP_CONTENT; // or a dp -> px value if you want taller
+                window.setLayout(width, height);
+                window.setBackgroundDrawableResource(R.drawable.rounded_dialog_bg);
+            }
+        });
+
+        dialog.show();
     }
 
     private void confirmSwitchToImportMap() {
-        new AlertDialog.Builder(this)
+        AlertDialog dialog =new AlertDialog.Builder(this)
                 .setMessage("Saved Map will be Exited. Are you sure you want to continue?")
-                .setPositiveButton("Yes", (dialog, which) -> loadFragment(new NewMap()))
-                .setNegativeButton("No", null)
-                .show();
+                .setPositiveButton("Yes", (d, which) -> loadFragment(new NewMap()))
+                .setNegativeButton("No", (d, which) -> {
+                    // user cancelled -> restore previous selection
+                    navBar.setSelectedItemId(R.id.saved_map);
+                })
+                .setOnCancelListener(d -> {
+                    // user cancelled -> restore previous selection
+                    navBar.setSelectedItemId(R.id.saved_map);
+                })
+                .create();
+
+        // Make the background rounded + semi-transparent
+        dialog.setOnShowListener(d -> {
+            Window window = dialog.getWindow();
+            if (window != null) {
+                DisplayMetrics dm = getResources().getDisplayMetrics();
+                int width = (int) (dm.widthPixels * 0.80); // 80% of screen width
+                int height = WindowManager.LayoutParams.WRAP_CONTENT; // or a dp -> px value if you want taller
+                window.setLayout(width, height);
+                window.setBackgroundDrawableResource(R.drawable.rounded_dialog_bg);
+            }
+        });
+
+        dialog.show();
     }
 
     @Override
@@ -280,7 +329,7 @@ public class BaseActivity extends AppCompatActivity {
 
     void dispose() {
         getSupportFragmentManager().beginTransaction()
-                .remove(getSupportFragmentManager().findFragmentById(R.id.container))
+                .remove(Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.container)))
                 .commitAllowingStateLoss();
         finishAffinity();
     }

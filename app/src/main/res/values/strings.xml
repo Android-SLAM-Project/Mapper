@@ -4,7 +4,7 @@
     <string name="coordinates">Coordinates</string>
     <string name="Total_Distance">Total Distance</string>
     <string name="End_Map">End Map</string>
-    <string name="Reset_Zoom">Reset Zoom</string>
+    <string name="Reset_Zoom">Reset\nZoom</string>
     <string name="Please_Move_your_Device">Please Move your Device</string>
     <string name="Import_Map">Import Map</string>
     <string name="Saved_Maps">Saved Maps</string>
@@ -17,7 +17,7 @@
     <string name="Enter_Maps_Height">Enter Map\'s Height</string>
     <string name="Enter_Maps_Width">Enter Map\'s Width</string>
     <string name="Next">Next</string>
-    <string name="Choose_Map_Starting_Point">Choose Map Starting Point</string>
+    <string name="Choose_Map_Starting_Point">Choose Your Starting Point</string>
     <string name="click_on_map_to_set_starting_point_move_to_starting_point">Click on map to set starting point &amp; Move To Starting Point</string>
     <string name="Start">Start</string>
     <string name="Steps">Steps</string>
@@ -76,6 +76,11 @@
         <string name="Invalid_map_parameters">Invalid map parameters</string>
         <string name="OK">OK</string>
     <string name="Potrait_mode">Potrait Mode</string>
+    <string name="apply_path_correction">Apply Path Calibration</string>
+    <string name="click_on_map_for_path_correction">Click on Map to apply path Calibration</string>
+    <string name="apply_path_calibration_prompt">Apply path calibration to X: %.2f, Y: %.2f ?</string>
+
+
 
 
 </resources>

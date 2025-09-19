@@ -8,18 +8,25 @@
 
 <!--        <item name="android:button">@style/MyCustomButtonStyle</item>-->
     </style>
+    <style name="BottomNavText.Small" parent="@style/TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">12dp</item>      <!-- smaller font -->
+        <item name="android:singleLine">true</item>    <!-- no wrap -->
+        <item name="android:ellipsize">end</item>      <!-- cut off if too long -->
+    </style>
 
     <style name="Theme.Imu_slam" parent="Base.Theme.Imu_slam" />
     <style name="CustomBottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
-        <item name="itemTextAppearanceActive">@style/TextAppearance.BottomNavigationView.Inactive</item>
-        <item name="itemTextAppearanceInactive">@style/TextAppearance.BottomNavigationView.Inactive</item>
+        <item name="itemTextAppearanceActive">@style/BottomNavText.Small</item>
+        <item name="itemTextAppearanceInactive">@style/BottomNavText.Small</item>
         <item name="itemBackground">@drawable/nav_item_background_selector</item>
         <item name="itemIconTint">#ffffff</item>
         <item name="itemTextColor">#ffffff</item>
         <item name="itemRippleColor">@android:color/transparent</item>
-        <item name="itemIconSize">24dp</item> <!-- Adjust icon size if needed -->
+        <item name="itemIconSize">18dp</item> <!-- Adjust icon size if needed -->
     </style>
-
+    <style name="BottomNavText" parent="@style/TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">10sp</item>
+    </style>
     <style name="TextAppearance.BottomNavigationView.Active" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textSize">12sp</item> <!-- Larger font for active item -->
         <item name="android:textStyle">normal</item>

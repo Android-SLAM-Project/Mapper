@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/nav_item_background_active" android:state_checked="true" />
-    <item android:drawable="@drawable/nav_item_background_inactive" />
+    <!-- Pressed state (no ripple) -->
+    <item android:state_pressed="true" android:drawable="@android:color/transparent"/>
+    <!-- Checked/selected state (no tint) -->
+    <item android:state_checked="true" android:drawable="@android:color/transparent"/>
+    <!-- Default state -->
+    <item android:drawable="@android:color/transparent"/>
 </selector>

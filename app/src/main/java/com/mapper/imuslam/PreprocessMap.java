@@ -113,8 +113,8 @@ public class PreprocessMap extends Fragment {
         Log.d("MapWidth", mapWidth);
 
         // Calculate display dimensions based on map dimensions.
-        int displayHeight = getResources().getDisplayMetrics().heightPixels - 10;
-        int displayWidth = getResources().getDisplayMetrics().widthPixels - 10;
+        int displayHeight = getResources().getDisplayMetrics().heightPixels -150;
+        int displayWidth = getResources().getDisplayMetrics().widthPixels - 150;
         int layoutWidth, layoutHeight;
         boolean isLandscape = displayWidth > displayHeight;
         int a = (int) (100 * this.getResources().getDisplayMetrics().density);

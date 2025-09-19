@@ -1,76 +1,100 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/preprocess_map_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:gravity="center"
+    android:background="@color/colorOnPrimary_dark"
     tools:context=".PreprocessMap">
 
-    <!-- Left side: Map inside FrameLayout so pointer overlay works -->
-
-    <FrameLayout
-        android:id="@+id/mapContainer"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="15dp"
-        android:paddingEnd="5dp"
-        android:gravity="center">
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="4dp">
 
-        <ImageView
-            android:id="@+id/mapImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="Map image"
-            android:scaleType="fitXY"
-            tools:srcCompat="@drawable/new_map" />
-
-    </FrameLayout>
-
-    <!-- Right side: Info + Controls -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="16dp">
-
-        <TextView
+        android:gravity="center"
+        android:orientation="vertical">
+        <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Choose_Map_Starting_Point"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:paddingBottom="8dp"
-            android:gravity="center" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/click_on_map_to_set_starting_point_move_to_starting_point"
-            android:textSize="16sp"
-            android:paddingBottom="16dp"
-            android:gravity="center" />
-
-        <Button
-            android:id="@+id/startButton"
-            style="@style/MyCustomButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Start"
-            android:visibility="invisible" />
-
-        <TextView
-            android:id="@+id/map_coordinates"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" "
-            android:textSize="16sp"
-            android:visibility="invisible"
-            android:layout_marginTop="16dp"
-            android:gravity="center" />
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            app:cardCornerRadius="12dp"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true">
+            <ImageView
+                android:id="@+id/mapImageView"
+                android:layout_width="wrap_content"
+android:backgroundTint="@color/material_dynamic_neutral30"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="5dp"
+                android:contentDescription="Map image"
+                android:scaleType="fitXY"
+                android:foregroundGravity="center"
+                tools:srcCompat="@drawable/new_map" />
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="@string/Choose_Map_Starting_Point"
+                android:textAllCaps="false"
+                android:textSize="24dp" />
+            <TextView
+                android:id="@+id/map_coordinates"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text=" "
+                android:textSize="16sp"
+                android:visibility="gone" />
 
-</LinearLayout>
+            <Button
+                android:id="@+id/startButton"
+                style="@style/MyCustomButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/start_button_bg"
+                android:elevation="8dp"
+                android:drawableStart="@drawable/ic_arrow_right"
+                android:drawablePadding="12dp"
+                android:gravity="center"
+                android:paddingStart="55dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="55dp"
+                android:paddingBottom="12dp"
+                android:text="@string/Start"
+                android:textAllCaps="false"
+                android:textColor="@color/colorOnPrimary_dark"
+                android:textSize="14sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+
+
+
+
+    </LinearLayout>
+</FrameLayout>

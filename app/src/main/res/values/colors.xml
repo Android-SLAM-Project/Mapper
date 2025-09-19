@@ -4,4 +4,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="colorOnPrimary">#FF000000</color>
     <color name="colorOnPrimary_dark">#FFFFFFFF</color>
+    <color name="stepFilled">#5B2CD3</color>       <!-- deep purple filled -->
+    <color name="stepStroke">#6F5AE5</color>       <!-- lighter purple stroke -->
+    <color name="lineActive">#5B2CD3</color>       <!-- same as filled -->
+    <color name="lineInactive">#CFCBF8</color>     <!-- pale purple for pending -->
+    <color name="focusRing">#E8E3FF</color>        <!-- soft outer ring -->
 </resources>

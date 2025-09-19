@@ -17,6 +17,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -26,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +43,9 @@ public class NewMap extends Fragment {
 
     private TextView DimensionText, HeightText, WidthText, subtitle;
     private EditText MapHeight, MapWidth;
-    private Button ImportMapImage, ToMapStart, loadPreviousMapButton;
+    LinearLayout HomeLayout,DimensionLayout;
+    private CardView ImportMapImage,loadPreviousMapButton;
+    private Button  ToMapStart;
     private Uri ImageUri;
     private boolean ImageSelected = false;
 
@@ -60,7 +64,8 @@ public class NewMap extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_new_map, container, false);
-
+        HomeLayout=v.findViewById(R.id.home_layout);
+        DimensionLayout=v.findViewById(R.id.Dimension_layout);
         // bind views
         DimensionText = v.findViewById(R.id.dimension_text);
         HeightText    = v.findViewById(R.id.height_text);
@@ -68,12 +73,13 @@ public class NewMap extends Fragment {
         MapHeight     = v.findViewById(R.id.map_height);
         MapWidth      = v.findViewById(R.id.map_width);
         subtitle      = v.findViewById(R.id.new_map_subtitle);
-        ImportMapImage       = v.findViewById(R.id.import_map_button);
+        ImportMapImage       = v.findViewById(R.id.import_map_card);
         ToMapStart           = v.findViewById(R.id.map_pos_activity_button);
-        loadPreviousMapButton= v.findViewById(R.id.resumeButton);
+        loadPreviousMapButton= v.findViewById(R.id.load_recent_map_card);
 
         // hide inputs until image picked
-        setFieldsVisibility(GONE);
+//        setFieldsVisibility(GONE);
+        DimensionLayout.setVisibility(GONE);
         setupBackPressed();
 
         // --- RESUME FLOW ---
@@ -111,7 +117,7 @@ public class NewMap extends Fragment {
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(getContext(),
-                                R.string.Error_loading_saved_map_metrics, Toast.LENGTH_SHORT).show();
+                                getString(R.string.Error_loading_saved_map_metrics), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -125,7 +131,7 @@ public class NewMap extends Fragment {
                         granted -> {
                             if (!granted) {
                                 Toast.makeText(getContext(),
-                                        R.string.Storage_permission_denied, Toast.LENGTH_SHORT).show();
+                                        getString(R.string.Storage_permission_denied), Toast.LENGTH_SHORT).show();
                             }
                         }
                 );
@@ -148,17 +154,20 @@ public class NewMap extends Fragment {
                                             .takePersistableUriPermission(picked, flags);
 
                                     ImageSelected = true;
-                                    setFieldsVisibility(VISIBLE);
-                                    subtitle.setVisibility(GONE);
-                                    ImportMapImage.setVisibility(GONE);
-                                    loadPreviousMapButton.setVisibility(GONE);
+
+                                    DimensionLayout.setVisibility(VISIBLE);
+                                    HomeLayout.setVisibility(GONE);
+//                                    setFieldsVisibility(VISIBLE);
+//                                    subtitle.setVisibility(GONE);
+//                                    ImportMapImage.setVisibility(GONE);
+//                                    loadPreviousMapButton.setVisibility(GONE);
 
                                     Toast.makeText(getContext(),
-                                            R.string.Image_loaded_successfully, Toast.LENGTH_SHORT).show();
+                                          getString(  R.string.Image_loaded_successfully), Toast.LENGTH_SHORT).show();
                                 }
                             } else {
                                 Toast.makeText(getContext(),
-                                        R.string.Image_loading_failed, Toast.LENGTH_SHORT).show();
+                                      getString(  R.string.Image_loading_failed), Toast.LENGTH_SHORT).show();
                             }
                         }
                 );
@@ -223,7 +232,7 @@ public class NewMap extends Fragment {
                 requireContext(), perm) != PackageManager.PERMISSION_GRANTED) {
             if (shouldShowRequestPermissionRationale(perm)) {
                 Toast.makeText(getContext(),
-                        R.string.Need_storage_access,
+                      getString(  R.string.Need_storage_access),
                         Toast.LENGTH_LONG).show();
             }
             permLauncher.launch(perm);
@@ -238,14 +247,14 @@ public class NewMap extends Fragment {
         }
     }
 
-    private void setFieldsVisibility(int v) {
-        DimensionText.setVisibility(v);
-        HeightText   .setVisibility(v);
-        WidthText    .setVisibility(v);
-        MapHeight    .setVisibility(v);
-        MapWidth     .setVisibility(v);
-        ToMapStart   .setVisibility(v);
-    }
+//    private void setFieldsVisibility(int v) {
+//        DimensionText.setVisibility(v);
+//        HeightText   .setVisibility(v);
+//        WidthText    .setVisibility(v);
+//        MapHeight    .setVisibility(v);
+//        MapWidth     .setVisibility(v);
+//        ToMapStart   .setVisibility(v);
+//    }
 
     private void setupBackPressed() {
         requireActivity().getOnBackPressedDispatcher().addCallback(
@@ -254,9 +263,9 @@ public class NewMap extends Fragment {
                     @Override
                     public void handleOnBackPressed() {
                         new AlertDialog.Builder(getContext())
-                                .setMessage(R.string.Exit_confirmation)
-                                .setPositiveButton(R.string.Yes, (d, w) -> requireActivity().finish())
-                                .setNegativeButton(R.string.No, null)
+                                .setMessage(getString(R.string.Exit_confirmation))
+                                .setPositiveButton(getString(R.string.Yes), (d, w) -> requireActivity().finish())
+                                .setNegativeButton(getString(R.string.No), null)
                                 .show();
                     }
                 }

@@ -42,6 +42,7 @@ dependencies {
     implementation("com.google.ar:core:1.38.0")
     implementation ("com.google.ar.sceneform.ux:sceneform-ux:1.17.1")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
-
+//    implementation ("com.gauravk.bubblenavigation:bubblenavigation:1.0.7")
+    implementation  ("io.ak1:bubbletabbar:1.0.8")
     androidTestImplementation(libs.espresso.core)
 }

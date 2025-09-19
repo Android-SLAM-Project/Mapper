@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/import_map"
-        android:icon="@drawable/new_map"
-        android:title="@string/Import_Map" />
+        android:icon="@drawable/home_icon"
+        android:title="@string/Import_Map"
+
+        android:layout="@layout/nav_item_custom"/>
     <item
         android:id="@+id/saved_map"
-        android:icon="@drawable/saved_map"
-        android:title="@string/Saved_Maps" />
+        android:icon="@drawable/opened_folder_icon"
+        android:title="@string/Saved_Maps"
+
+        android:layout="@layout/nav_item_custom"/>
 </menu>

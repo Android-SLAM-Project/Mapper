@@ -4,13 +4,15 @@
     <item
         android:id="@+id/import_map"
         android:title="@string/Import_Map"
-        app:showAsAction="always|withText"
+        android:icon="@drawable/home_icon"
+        android:layout="@layout/nav_item_custom"
 
         />
     <item
         android:id="@+id/saved_map"
         android:title="@string/Saved_Maps"
-        app:showAsAction="always|withText"
+        android:icon="@drawable/opened_folder_icon"
+        android:layout="@layout/nav_item_custom"
 
         />
 </menu>

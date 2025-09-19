@@ -75,5 +75,8 @@
         <string name="Invalid_map_parameters">無効なマップパラメータ</string>
         <string name="OK">わかりました</string>
         <string name="Potrait_mode">ポートレートモード</string>
+    <string name="apply_path_correction">経路キャリブレーションを適用</string>
+    <string name="click_on_map_for_path_correction">マップをクリックして経路キャリブレーションを適用</string>
+    <string name="apply_path_calibration_prompt">X: %.2f、Y: %.2f に経路キャリブレーションを適用しますか？</string>
 
 </resources>

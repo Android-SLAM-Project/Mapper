@@ -12,6 +12,8 @@ import android.util.Log;
 public class TrailingLineView extends View {
     private Paint paint;
     private Path path;
+    private Float startX = null;
+    private Float startY = null;
 
     public TrailingLineView(Context context) {
         super(context);
@@ -36,6 +38,8 @@ public class TrailingLineView extends View {
     public void addPoint(float x, float y) {
         if (path.isEmpty()) {
             path.moveTo(x, y);
+            startX = x;
+            startY = y;
             Log.d("TrailingLineView", "First point added: (" + x + ", " + y + ")");
         } else {
             path.lineTo(x, y);
@@ -43,6 +47,22 @@ public class TrailingLineView extends View {
         }
         invalidate();
     }
+    public void clear() {
+        path.reset();
+        startX = null;
+        startY = null;
+        invalidate();
+    }
+    public void clearExceptStart() {
+        if (startX != null && startY != null) {
+            path.reset();
+            path.moveTo(startX, startY); // Move back to the original start point
+        } else {
+            path.reset();
+        }
+        invalidate();
+    }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
