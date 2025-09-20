@@ -17,7 +17,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -65,11 +67,15 @@ public class SavedMap extends Fragment {
         if (mapsDir.exists() && mapsDir.isDirectory()) {
             File[] folders = mapsDir.listFiles(File::isDirectory);
             if (folders != null) {
+
+
+
                 for (File folder : folders) {
                     String folderName = folder.getName();
                     mapNames.add(folderName);
                     String title = folderName;
                     String subtitle = "";
+                    long time = parseFolderTime(folderName);
                     try {
                         String[] parts = folderName.split("_");
                         // defensive check: parts length >= 7 -> ["SLAM","Map","yyyy","mm","dd","hh","mm","ss"] maybe 8
@@ -130,21 +136,22 @@ public class SavedMap extends Fragment {
                     }
 
                     // create and add item
-                    mapItems.add(new MyMapItem(thumb, title, subtitle));
+
+                    mapItems.add(new MyMapItem(thumb, title, subtitle,time));
 
                 }
             }
         } else {
             Toast.makeText(requireContext(), "SLAM_MAPS folder not found", Toast.LENGTH_SHORT).show();
         }
-
+        Collections.sort(mapItems, (a, b) -> Long.compare(b.timestamp, a.timestamp));
         MapAdapter Mapadapter = new MapAdapter(requireContext(), mapItems);
         //ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, mapNames);
         mapsList.setAdapter(Mapadapter);
 
         mapsList.setOnItemClickListener((parent, view1, position, id) -> {
-            String selectedFolderName = mapNames.get(position);
-
+            MyMapItem clickedItem = mapItems.get(position);
+            String selectedFolderName = clickedItem.getTitle();// title holds folder name
             File selectedFolder = new File(mapsDir, selectedFolderName);
             // Log the selected folder absolute path for diagnostics.
 //            Toast.makeText(requireContext(), "Opening folder: " + selectedFolder.getAbsolutePath(), Toast.LENGTH_SHORT).show();
@@ -168,4 +175,18 @@ public class SavedMap extends Fragment {
         });
         return view;
     }
+    private long parseFolderTime(String folderName) {
+        try {
+            String[] p = folderName.split("_");
+            if (p.length >= 8) {
+                String dt = p[2] + "-" + p[3] + "-" + p[4] + " "
+                        + p[5] + ":" + p[6] + ":" + p[7];
+                SimpleDateFormat sdf =
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+                return sdf.parse(dt).getTime();
+            }
+        } catch (Exception ignore) {}
+        return 0L;
+    }
+
 }

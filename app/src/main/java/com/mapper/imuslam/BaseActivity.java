@@ -14,6 +14,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -252,6 +253,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.appbar_items, menu);
+
         if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
             try {
                 Method m = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
@@ -263,6 +265,8 @@ public class BaseActivity extends AppCompatActivity {
         }
         return true;
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

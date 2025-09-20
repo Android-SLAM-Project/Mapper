@@ -7,7 +7,10 @@ import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -19,7 +22,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import org.json.JSONObject;
+
 import java.io.File;
 import java.util.Scanner;
 
@@ -40,6 +45,7 @@ public class PreprocessMap extends Fragment {
     private float touchX, touchY;
     private int mapH, mapW;
     private String startX, startY;
+//    CardView bgcardView;
 
     public PreprocessMap() {
         // Required empty public constructor.
@@ -107,42 +113,61 @@ public class PreprocessMap extends Fragment {
         previewImage = view.findViewById(R.id.mapImageView);
         StartButton = view.findViewById(R.id.startButton);
         mapCoordinates = view.findViewById(R.id.map_coordinates);
-
+//        bgcardView = view.findViewById(R.id.bgcardView);
         Log.d("ImageUri", imageUri);
         Log.d("MapHeight", mapHeight);
         Log.d("MapWidth", mapWidth);
 
         // Calculate display dimensions based on map dimensions.
-        int displayHeight = getResources().getDisplayMetrics().heightPixels -150;
+        int displayHeight = getResources().getDisplayMetrics().heightPixels - 150;
         int displayWidth = getResources().getDisplayMetrics().widthPixels - 150;
         int layoutWidth, layoutHeight;
         boolean isLandscape = displayWidth > displayHeight;
         int a = (int) (100 * this.getResources().getDisplayMetrics().density);
-        if(isLandscape){displayHeight=displayHeight-a;}
-        if (mapW > mapH) {
-            if (isLandscape) {
-                // fit to height in landscape
-                layoutHeight = displayHeight;
-                layoutWidth = (int) ((displayHeight * mapW) / (float) mapH);
-            } else {
-                // fit to width in portrait
-                layoutWidth = displayWidth;
-                layoutHeight = (int) ((displayWidth * mapH) / (float) mapW);
-            }
-        } else {
-            if (isLandscape) {
-                // fit to height in landscape
-                layoutHeight = displayHeight;
-                layoutWidth = (int) ((displayHeight * mapW) / (float) mapH);
-            } else {
-                // fit to width in portrait
-                layoutWidth = displayWidth;
-                layoutHeight = (int) ((displayWidth * mapH) / (float) mapW);
-            }
+        if (isLandscape) {
+            displayHeight = displayHeight - a;
         }
+//        if (mapW > mapH) {
+//            if (isLandscape) {
+//                // fit to height in landscape
+//                layoutHeight = displayHeight;
+//                layoutWidth = (int) ((displayHeight * mapW) / (float) mapH);
+//            } else {
+//                // fit to width in portrait
+//                layoutWidth = displayWidth;
+//                layoutHeight = (int) ((displayWidth * mapH) / (float) mapW);
+//            }
+//        }
+//        else {
+//            if (isLandscape) {
+//                // fit to height in landscape
+//                layoutHeight = displayHeight;
+//                layoutWidth = (int) ((displayHeight * mapW) / (float) mapH);
+//            } else {
+//                // fit to width in portrait
+//                layoutWidth = displayWidth;
+//                layoutHeight = (int) ((displayWidth * mapH) / (float) mapW);
+//            }
+//        }
+        float mapAspect = (float) mapW / mapH;
+        float displayAspect = (float) displayWidth / displayHeight;
+
+        if (mapAspect > displayAspect) {
+            // Map is proportionally wider than the screen area → fit width
+            layoutWidth = displayWidth;
+            layoutHeight = (int) (displayWidth / mapAspect);
+        } else {
+            // Map is proportionally taller → fit height
+            layoutHeight = displayHeight;
+            layoutWidth = (int) (displayHeight * mapAspect);
+        }
+
         layoutWidth = Math.min(layoutWidth, displayWidth);
         layoutHeight = Math.min(layoutHeight, displayWidth);
-
+//        ViewGroup.LayoutParams cardParams = bgcardView.getLayoutParams();
+//        cardParams.width = layoutWidth + 150;//(int)(8 * getResources().getDisplayMetrics().density);
+//        cardParams.height = layoutHeight + 150;//(int)(8 * getResources().getDisplayMetrics().density);
+//        bgcardView.setLayoutParams(cardParams);
         // Set up container for the map image.
         ViewGroup parent = (ViewGroup) previewImage.getParent();
         if (parent instanceof FrameLayout) {
@@ -199,6 +224,30 @@ public class PreprocessMap extends Fragment {
         previewImage.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN ||
                     event.getAction() == MotionEvent.ACTION_MOVE) {
+                float viewWidth1  = previewImage.getWidth();
+                float viewHeight1 = previewImage.getHeight();
+
+                float imgWidth   = previewImage.getDrawable().getIntrinsicWidth();
+                float imgHeight  = previewImage.getDrawable().getIntrinsicHeight();
+
+                // 2. compute scale used to fit the image (FIT_CENTER-like)
+                float scale = Math.min(viewWidth1 / imgWidth, viewHeight1 / imgHeight);
+
+                // 3. find the offset because image is centered in the view
+                float dx = (viewWidth1  - imgWidth  * scale) / 2f;
+                float dy = (viewHeight1 - imgHeight * scale) / 2f;
+
+                // 4. convert touch to bitmap-relative coordinates
+                float touchX = (event.getX() - dx) / scale;
+                float touchY = (event.getY() - dy) / scale;
+
+                // clamp to image bounds if needed
+                touchX = Math.max(0, Math.min(touchX, imgWidth));
+                touchY = Math.max(0, Math.min(touchY, imgHeight));
+
+                // now use touchX, touchY for your pointer
+                Log.d("Pointer", "X:" + touchX + "  Y:" + touchY);
+
                 BitmapDrawable drawable = (BitmapDrawable) previewImage.getDrawable();
                 if (drawable == null) return false;
                 int viewWidth = previewImage.getWidth();
@@ -210,6 +259,7 @@ public class PreprocessMap extends Fragment {
 
                 calculateCoordinatesRelativeToImage(rawX, rawY);
                 updatePointerPosition(rawX, rawY);
+                Log.d("RAW", "X:" + rawX + "  Y:" + rawY);
                 return true;
             }
             return false;
@@ -227,8 +277,8 @@ public class PreprocessMap extends Fragment {
                 intent.putExtra("startY", startY);
                 // Pass the folder path if it exists (for resuming maps).
 //                intent.putExtra("mapFolderPath", getArguments() != null ? getArguments().getString("mapFolderPath") : "");
-                intent.putExtra("mapFolderPath","");
-                        startActivity(intent);
+                intent.putExtra("mapFolderPath", "");
+                startActivity(intent);
             } else {
                 Toast.makeText(getContext(), "Please select a starting point on the map", Toast.LENGTH_SHORT).show();
             }

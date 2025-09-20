@@ -52,6 +52,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -59,7 +60,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMapTappedListener, ZoomPanLayout.OnZoomPanListener {
+public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMapTappedListener, ZoomPanLayout.OnZoomPanListener
+{
 
     private static final String TAG = "DisplayMap";
     private static final int REQUEST_CODE_ACTIVITY_RECOGNITION = 1001;
@@ -72,6 +74,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
     // Progress for screen 1
     private ProgressBar circleProgress;
     private TextView timerText;
+    int  correctionPointerCount=20;
     boolean mapClickable = false;
 
     // Progress for screen 2
@@ -85,6 +88,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
     private float mapHeight, mapWidth, startX, startY;
 
     private ZoomPanLayout rootLayout;
+
     private ImageView mapView;
     //    private TextView coordinatesText;
 //    private TextView stepsDistanceTextView;
@@ -200,21 +204,38 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             mapFolder.mkdirs();
         }
 
-        int displayWidth = getResources().getDisplayMetrics().widthPixels - 10;
-        int displayHeight = getResources().getDisplayMetrics().heightPixels - 10;
+        int displayHeight = getResources().getDisplayMetrics().heightPixels - 150;
+        int displayWidth = getResources().getDisplayMetrics().widthPixels - 150;
         boolean isLandscape = displayWidth > displayHeight;
-        int a = (int) (60 * this.getResources().getDisplayMetrics().density);
+        int a = (int) (100 * this.getResources().getDisplayMetrics().density);
+
         if (isLandscape) {
             displayHeight = displayHeight - a;
         }
+
         int layoutWidth, layoutHeight;
-        if (isLandscape) {
-            layoutWidth = (int) ((displayHeight * mapWidth) / mapHeight);
-            layoutHeight = displayHeight;
-        } else {
+        float mapAspect = (float) mapWidth / mapHeight;
+        float displayAspect = (float) displayWidth / displayHeight;
+        if (mapAspect > displayAspect) {
+            // Map is proportionally wider than the screen area → fit width
             layoutWidth = displayWidth;
-            layoutHeight = (int) ((displayWidth * mapHeight) / mapWidth);
+            layoutHeight = (int) (displayWidth / mapAspect);
+        } else {
+            // Map is proportionally taller → fit height
+            layoutHeight = displayHeight;
+            layoutWidth = (int) (displayHeight * mapAspect);
         }
+
+        layoutWidth = Math.min(layoutWidth, displayWidth);
+        layoutHeight = Math.min(layoutHeight, displayWidth);
+
+//        if (isLandscape) {
+//            layoutWidth = (int) ((displayHeight * mapWidth) / mapHeight);
+//            layoutHeight = displayHeight;
+//        } else {
+//            layoutWidth = displayWidth;
+//            layoutHeight = (int) ((displayWidth * mapHeight) / mapWidth);
+//        }
         resetZoomButton = findViewById(R.id.resetZoom_card);
 
         rootLayout = findViewById(R.id.root_layout);
@@ -227,6 +248,8 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         distanceTXT = findViewById(R.id.distanceTXT);
         CoordinatesTXT = findViewById(R.id.CoordinatesTXT);
         path_calibration_subtitle=findViewById(R.id.subtitleText2);
+
+
         ConstraintLayout.LayoutParams clp = (ConstraintLayout.LayoutParams) rootLayout.getLayoutParams();
         clp.width = layoutWidth;
         clp.height = layoutHeight;
@@ -262,6 +285,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
                         handleCameraResult(result.getData());
                     }
                 });
+
         rootLayout.setZoomEnabled(false);
         resetZoomButton.setOnClickListener(v -> {
             rootLayout.resetZoom();
@@ -278,7 +302,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
 //        });
         CardView clickPhotoButton = findViewById(R.id.AddPhoto_card);
         clickPhotoButton.setOnClickListener(v -> {
-            addStaticMarker();
+
             openCamera();
         });
 
@@ -482,12 +506,18 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
                             float centerY = clampedY + (pointerSize / 2f);
                             trailingLineView.addPoint(centerX, centerY);
                             lastCORDx=centerX;lastCORDy=centerY;
-                            startX=centerX;startY=centerY;
+                            startX = finalCorrectedMapX;
+                            startY = finalCorrectedMapY;
 
                             Log.d("KR2_L","Point Added : "+centerX+","+centerY);
                             crtptAdded=true;
+                            correctionPointerCount=20;
                         }
-                        correctionActive = false;
+
+//                        correctionActive = false;
+//                        correctionAngle = 0f;
+//                        correctionTransX = 0f;
+//                        correctionTransY = 0f;
                     })
                     .setNegativeButton(getString(R.string.Cancel), null)
                     .show();
@@ -577,7 +607,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             if (pathLayout != null && pathLayout.getVisibility() == View.VISIBLE) {
                 stepProgress.setMax(15);
                 stepProgress.setProgress(steps);
-                stepCountText.setText(steps + "");
+                stepCountText.setText("Steps\n\n"+steps);
 
                 if (steps >= 15) {
 
@@ -645,17 +675,38 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         float correctedY = rawMapY;
 
          if (correctionActive) {
-
-            float[] rotated = rotatePoint(rawMapX, rawMapY, startX, startY, correctionAngle,lastCORDx,lastCORDy);
-            correctedX = rotated[0] + correctionTransX;
-            correctedY = rotated[1] + correctionTransY;
+             if(!crtptAdded){
+                 float[] rotated = rotatePoint(rawMapX, rawMapY, startX, startY, correctionAngle, lastCORDx, lastCORDy);
+                 correctedX = rotated[0] + correctionTransX;
+                 correctedY = rotated[1] + correctionTransY;
+             }
+             if(correctionPointerCount<1) {
+                 crtptAdded=false;
+             }
+             correctionPointerCount--;
 
         }
         Log.d("KR", "rawMapX: " + rawMapX + " rawMapY: " + rawMapY + " Corrected X and Y : " + correctedX + " , " + correctedY + " Correction Angle :" + correctionAngle);
         // Use corrected coords from here onward (important!)
         lastMapX = correctedX;
         lastMapY = correctedY;
-
+//        float[][] corners = {
+//                {0,0}, {mapWidth,0}, {mapWidth,mapHeight}, {0,mapHeight}
+//        };
+//        float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE;
+//        float maxX = Float.MIN_VALUE, maxY = Float.MIN_VALUE;
+//        for (float[] c : corners) {
+//            float[] r = rotatePoint(c[0], c[1], startX, startY, correctionAngle,0,0);
+//            float rx = r[0] + correctionTransX;
+//            float ry = r[1] + correctionTransY;
+//            minX = Math.min(minX, rx);
+//            minY = Math.min(minY, ry);
+//            maxX = Math.max(maxX, rx);
+//            maxY = Math.max(maxY, ry);
+//        }
+//// update map bounds so UI scaling fits the rotated map
+//        mapWidth  = maxX - minX;
+//        mapHeight = maxY - minY;
         // Clamp for display
         showx = Math.max(0, Math.min(correctedX, mapWidth));
         showy = Math.max(0, Math.min(correctedY, mapHeight));
@@ -704,6 +755,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             Bitmap cameraPhoto = (Bitmap) data.getExtras().get("data");
             if (cameraPhoto != null) {
                 savePhoto(cameraPhoto);
+
             }
         }
     }
@@ -716,34 +768,114 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
                 cameraPhoto.compress(Bitmap.CompressFormat.JPEG, 90, fos);
             }
             updatePhotosMetadata(file.getName(), lastMapX, lastMapY, mapWidth, mapHeight);
+
         } catch (IOException e) {
             Toast.makeText(this, getString(R.string.Error_saving_photo) + " " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Error saving photo", e);
         }
     }
 
-    private void updatePhotosMetadata(String photoFileName, float x, float y, float origMapWidth, float origMapHeight) {
-        try {
-            File jsonFile = new File(mapFolder, "photos.json");
-            JSONArray jsonArray = new JSONArray();
-            if (jsonFile.exists()) {
-                // Read existing content
+//    private void updatePhotosMetadata(String photoFileName, float x, float y, float origMapWidth, float origMapHeight) {
+//        try {
+//            File jsonFile = new File(mapFolder, "photos.json");
+//            JSONArray jsonArray = new JSONArray();
+//            if (jsonFile.exists()) {
+//                // Read existing content
+//            }
+//            JSONObject newEntry = new JSONObject();
+//            newEntry.put("mapX", x);
+//            newEntry.put("mapY", y);
+//            newEntry.put("cameraPhoto", photoFileName);
+//            newEntry.put("mapWidth", origMapWidth);
+//            newEntry.put("mapHeight", origMapHeight);
+//            jsonArray.put(newEntry);
+//            try (FileOutputStream fos = new FileOutputStream(jsonFile)) {
+//                fos.write(jsonArray.toString().getBytes());
+//            }
+////            Toast.makeText(this, getString(R.string.Metadata_updated), Toast.LENGTH_SHORT).show();
+//            addStaticMarker();
+//        } catch (Exception e) {
+//            Log.e(TAG, "Error updating metadata", e);
+//        }
+//    }
+private void updatePhotosMetadata(String photoFileName, float x, float y, float origMapWidth, float origMapHeight) {
+    try {
+        File jsonFile = new File(mapFolder, "photos.json");
+        JSONArray jsonArray;
+
+        // Read existing array if file exists and is non-empty
+        if (jsonFile.exists()) {
+            StringBuilder sb = new StringBuilder();
+            try (FileInputStream fis = new FileInputStream(jsonFile)) {
+                int ch;
+                while ((ch = fis.read()) != -1) {
+                    sb.append((char) ch);
+                }
+            } catch (IOException readEx) {
+                Log.e(TAG, "Error reading photos.json, will recreate. " + readEx.getMessage(), readEx);
+                sb.setLength(0); // treat as empty
             }
-            JSONObject newEntry = new JSONObject();
-            newEntry.put("mapX", x);
-            newEntry.put("mapY", y);
-            newEntry.put("cameraPhoto", photoFileName);
-            newEntry.put("mapWidth", origMapWidth);
-            newEntry.put("mapHeight", origMapHeight);
-            jsonArray.put(newEntry);
-            try (FileOutputStream fos = new FileOutputStream(jsonFile)) {
-                fos.write(jsonArray.toString().getBytes());
+
+            String content = sb.toString().trim();
+            if (!content.isEmpty()) {
+                try {
+                    jsonArray = new JSONArray(content);
+                } catch (Exception parseEx) {
+                    // If parsing fails, log and start a fresh array (prevents crash on corrupted file)
+                    Log.e(TAG, "photos.json parse error, creating new array. " + parseEx.getMessage(), parseEx);
+                    jsonArray = new JSONArray();
+                }
+            } else {
+                jsonArray = new JSONArray();
             }
-            Toast.makeText(this, getString(R.string.Metadata_updated), Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Log.e(TAG, "Error updating metadata", e);
+        } else {
+            jsonArray = new JSONArray();
         }
+
+        // Build new entry
+        JSONObject newEntry = new JSONObject();
+        newEntry.put("mapX", x);
+        newEntry.put("mapY", y);
+        newEntry.put("cameraPhoto", photoFileName);
+        newEntry.put("mapWidth", origMapWidth);
+        newEntry.put("mapHeight", origMapHeight);
+        newEntry.put("timestamp", System.currentTimeMillis());
+
+        // Append and write back
+        jsonArray.put(newEntry);
+
+        // Write to a temp file then rename (safer)
+        File tmpFile = new File(mapFolder, "photos_tmp.json");
+        try (FileOutputStream fos = new FileOutputStream(tmpFile)) {
+            fos.write(jsonArray.toString(2).getBytes()); // pretty-print with indent 2
+            fos.getFD().sync();
+        }
+        // replace original
+        if (jsonFile.exists()) {
+            if (!jsonFile.delete()) {
+                Log.w(TAG, "Failed to delete old photos.json");
+            }
+        }
+        if (!tmpFile.renameTo(jsonFile)) {
+            // fallback: try to copy
+            try (FileInputStream fis = new FileInputStream(tmpFile);
+                 FileOutputStream fos2 = new FileOutputStream(jsonFile)) {
+                byte[] buf = new byte[4096];
+                int len;
+                while ((len = fis.read(buf)) > 0) {
+                    fos2.write(buf, 0, len);
+                }
+            }
+            tmpFile.delete();
+        }
+
+        Log.d(TAG, "photos.json updated, total entries = " + jsonArray.length());
+        addStaticMarker();
+
+    } catch (Exception e) {
+        Log.e(TAG, "Error updating photos metadata", e);
     }
+}
 
     private void addStaticMarker() {
         runOnUiThread(() -> {
@@ -869,19 +1001,19 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
     private void startPathCalibration() {
         stepProgress.setMax(15);
         stepProgress.setProgress(0);
-        stepCountText.setText("0");
+        stepCountText.setText("Steps\n\n0");
 
         // If the step counter has already recorded some steps, immediately reflect that
         int steps = stepCounterManager.getSessionSteps();
         stepProgress.setProgress(steps);
-        stepCountText.setText("" + steps);
+        stepCountText.setText("Steps\n\n" + steps);
 
         // If already done, flip screens immediately
         if (steps >= 15) {
             mapClickable = true;
             applyPathCorrectionMode = true;
             stepProgress.setVisibility(INVISIBLE);
-            stepCountText.setText(getString(R.string.click_on_map_for_path_correction));
+//            stepCountText.setText(getString(R.string.click_on_map_for_path_correction));
         }
     }
 

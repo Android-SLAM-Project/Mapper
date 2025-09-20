@@ -203,6 +203,7 @@ public class SingleMap extends Fragment {
                     float pointerY = bmp.getHeight() - ((arMapY / origMapHeight) * bmp.getHeight());
                     pointers.add(new PhotoPointer(pointerX, pointerY, cameraPhotoName,
                             arMapX, arMapY, origMapWidth, origMapHeight));
+                    Log.d("IMAGES ", "Processed photo metadata: " + cameraPhotoName+" pointerX: "+pointerX+" pointerY: "+pointerY+" arMapX: "+arMapX+" arMapY: "+arMapY+" origMapWidth: "+origMapWidth+" origMapHeight: "+origMapHeight);
                 } catch (Exception e) {
                     Log.e(TAG, "Error processing photo metadata");
                 }
@@ -366,7 +367,7 @@ public class SingleMap extends Fragment {
                         lastTouchY = event.getY();
                         break;
                     case MotionEvent.ACTION_UP:
-                        handleTap(event.getX(), event.getY());
+//                        handleTap(event.getX(), event.getY());
                         break;
                 }
             }

@@ -36,6 +36,8 @@ public class TrailingLineView extends View {
 
     // Adds a new point to the path.
     public void addPoint(float x, float y) {
+//        x = Math.max(0, Math.min(y, containerWidth));
+//        x = Math.max(0, Math.min(y, containerHeight));
         if (path.isEmpty()) {
             path.moveTo(x, y);
             startX = x;

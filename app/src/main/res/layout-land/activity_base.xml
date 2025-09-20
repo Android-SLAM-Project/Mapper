@@ -3,18 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/white"
     android:layout_height="match_parent"
     tools:context=".BaseActivity">
 
     <!-- Background image -->
-    <ImageView
-        android:id="@+id/backgroundImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bg_1"
-        android:alpha="0.7"
-        android:contentDescription="@null" />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/backgroundImage"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:scaleType="centerCrop"-->
+    <!--        android:src="@drawable/bg_1"-->
+    <!--        android:alpha="0.7"-->
+    <!--        android:contentDescription="@null" />-->
 
     <!-- Your existing layout on top of the background -->
     <LinearLayout
