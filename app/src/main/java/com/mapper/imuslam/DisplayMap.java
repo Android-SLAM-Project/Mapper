@@ -6,12 +6,14 @@ import static android.view.View.VISIBLE;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -19,10 +21,12 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -60,21 +64,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMapTappedListener, ZoomPanLayout.OnZoomPanListener
-{
+public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMapTappedListener, ZoomPanLayout.OnZoomPanListener {
 
     private static final String TAG = "DisplayMap";
     private static final int REQUEST_CODE_ACTIVITY_RECOGNITION = 1001;
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 1002;
     private static int STEPS = 0;
     TextView path_calibration_subtitle;
-    boolean crtptAdded=false;
+    boolean crtptAdded = false;
     private LinearLayout sensorLayout, pathLayout, menuLayout;
 
     // Progress for screen 1
     private ProgressBar circleProgress;
     private TextView timerText;
-    int  correctionPointerCount=20;
+    int CPC_THRESH = 30;
+    int correctionPointerCount;
     boolean mapClickable = false;
 
     // Progress for screen 2
@@ -88,6 +92,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
     private float mapHeight, mapWidth, startX, startY;
 
     private ZoomPanLayout rootLayout;
+    TextView skipPathCalibration;
 
     private ImageView mapView;
     //    private TextView coordinatesText;
@@ -103,10 +108,10 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
     private static final int POINTER_SIZE_DP = 20;
 
     private ArFragment arFragment;
-    private float lastMapX, lastMapY,lastCORDx,lastCORDy;
+    private float lastMapX, lastMapY, lastCORDx, lastCORDy;
 
     public boolean trailing;
-    private int correction_pointer=0;
+    private int correction_pointer = 0;
 
     private ActivityResultLauncher<Intent> cameraLauncher;
     private File mapFolder;
@@ -160,7 +165,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
 
         stepProgress = findViewById(R.id.stepProgress);
         stepCountText = findViewById(R.id.stepCountText);
-
+        skipPathCalibration=findViewById(R.id.skipPathCalibration);
         Toolbar appBar = findViewById(R.id.appbar);
         setSupportActionBar(appBar);
         trailing = settings.getTrailingFlag();
@@ -171,7 +176,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         menuLayout.setVisibility(View.GONE);
         Intent intent = getIntent();
 
-
+        correctionPointerCount = CPC_THRESH;
         if (intent != null) {
             imageUri = intent.getStringExtra("imageUri");
             mapHeightStr = intent.getStringExtra("mapHeight");
@@ -247,7 +252,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         stepsTXT = findViewById(R.id.steps_TXT);
         distanceTXT = findViewById(R.id.distanceTXT);
         CoordinatesTXT = findViewById(R.id.CoordinatesTXT);
-        path_calibration_subtitle=findViewById(R.id.subtitleText2);
+        path_calibration_subtitle = findViewById(R.id.subtitleText2);
 
 
         ConstraintLayout.LayoutParams clp = (ConstraintLayout.LayoutParams) rootLayout.getLayoutParams();
@@ -292,6 +297,17 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             isZoomed = false;
             resetZoomButton.setVisibility(GONE);
         });
+        skipPathCalibration.setOnClickListener(v->{
+            if(applyPathCorrectionMode){
+                applyPathCorrectionMode = false;
+                correctionAngle = 0;
+                correctionTransX = 0;
+                correctionTransY = 0;
+                correctionActive =false;
+                showMenuLayout();
+                Toast.makeText(DisplayMap.this, "Callibration Success", Toast.LENGTH_SHORT).show();
+            }
+        });
 //        ApplyPathCorrection.setOnClickListener(v -> {
         rootLayout.resetZoom();
         isZoomed = false;
@@ -327,7 +343,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         startSensorCalibration();
     }
 
-    private float[] rotatePoint(float x, float y, float cx, float cy, float angle,float lastx,float lasty) {
+    private float[] rotatePoint(float x, float y, float cx, float cy, float angle, float lastx, float lasty) {
         Log.d("Kr", "Correction Angle : " + Math.toDegrees(angle));
         float dx = x - cx;
         float dy = y - cy;
@@ -340,190 +356,410 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
 
     @Override
     public void onMapTapped(float touchX, float touchY) {
-        if(mapClickable){
-        if (isZoomed) {
-            Toast.makeText(this, getString(R.string.Reset_zoom_before_correction), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (applyPathCorrectionMode && isZoomed) {
-            Toast.makeText(this, getString(R.string.Reset_zoom_before_correction), Toast.LENGTH_SHORT).show();
-            rootLayout.resetZoom();
-            isZoomed = false;
-            resetZoomButton.setVisibility(GONE);
-            return;
-        }
+        if (mapClickable) {
+            if (isZoomed) {
+                Toast.makeText(this, getString(R.string.Reset_zoom_before_correction), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (applyPathCorrectionMode && isZoomed) {
+                Toast.makeText(this, getString(R.string.Reset_zoom_before_correction), Toast.LENGTH_SHORT).show();
+                rootLayout.resetZoom();
+                isZoomed = false;
+                resetZoomButton.setVisibility(GONE);
+                return;
+            }
 
-        int containerWidth = mapView.getWidth();
-        int containerHeight = mapView.getHeight();
+            int containerWidth = mapView.getWidth();
+            int containerHeight = mapView.getHeight();
 
-        float correctedMapX = (touchX / containerWidth) * mapWidth;
-        float correctedMapY = mapHeight - ((touchY / containerHeight) * mapHeight);
+            float correctedMapX = (touchX / containerWidth) * mapWidth;
+            float correctedMapY = mapHeight - ((touchY / containerHeight) * mapHeight);
 
-        correctedMapX = Math.max(0, Math.min(correctedMapX, mapWidth));
-        correctedMapY = Math.max(0, Math.min(correctedMapY, mapHeight));
+            correctedMapX = Math.max(0, Math.min(correctedMapX, mapWidth));
+            correctedMapY = Math.max(0, Math.min(correctedMapY, mapHeight));
 
-        final float finalCorrectedMapX = correctedMapX;
-        final float finalCorrectedMapY = correctedMapY;
+            final float finalCorrectedMapX = correctedMapX;
+            final float finalCorrectedMapY = correctedMapY;
 
-        if (applyPathCorrectionMode)
-        {
+            if (applyPathCorrectionMode) {
 
-            // PATH (rotation) CORRECTION
-            new AlertDialog.Builder(DisplayMap.this)
-                    .setTitle(getString(R.string.apply_path_correction))
-                    .setMessage(String.format(Locale.getDefault(),
-                            getString(R.string.apply_path_calibration_prompt), finalCorrectedMapX, finalCorrectedMapY))
-                    .setPositiveButton(getString(R.string.Yes), (dialog, which) -> {
+                // PATH (rotation) CORRECTION
+                new AlertDialog.Builder(DisplayMap.this)
+                        .setTitle(getString(R.string.apply_path_correction))
+                        .setMessage(String.format(Locale.getDefault(),
+                                getString(R.string.apply_path_calibration_prompt), finalCorrectedMapX, finalCorrectedMapY))
+                        .setPositiveButton(getString(R.string.Yes), (dialog, which) -> {
 
-                        // Prefer raw current map point from AR frame (so we compute deltaAngle from raw values)
-                        float currentMapX;
-                        float currentMapY;
-                        com.google.ar.core.Frame frame = null;
-                        if (arFragment != null && arFragment.getArSceneView() != null) {
-                            frame = arFragment.getArSceneView().getArFrame();
-                        }
-                        if (frame != null) {
-                            Pose cameraPose = frame.getCamera().getPose();
-                            float displacementX = cameraPose.tx();
-                            float displacementY = cameraPose.tz();
-                            currentMapX = startX + displacementX;
-                            currentMapY = startY - displacementY;
-                        } else {
-                            // fallback to lastMap if AR frame not available
-                            currentMapX = lastMapX;
-                            currentMapY = lastMapY;
-                        }
+                            // Prefer raw current map point from AR frame (so we compute deltaAngle from raw values)
+                            float currentMapX;
+                            float currentMapY;
+                            com.google.ar.core.Frame frame = null;
+                            if (arFragment != null && arFragment.getArSceneView() != null) {
+                                frame = arFragment.getArSceneView().getArFrame();
+                            }
+                            if (frame != null) {
+                                Pose cameraPose = frame.getCamera().getPose();
+                                float displacementX = cameraPose.tx();
+                                float displacementY = cameraPose.tz();
+                                currentMapX = startX + displacementX;
+                                currentMapY = startY - displacementY;
+                            } else {
+                                // fallback to lastMap if AR frame not available
+                                currentMapX = lastMapX;
+                                currentMapY = lastMapY;
+                            }
 
-                        // compute delta angle between A->C (old) and A->B (new tapped)
-                        float angleOld = (float) Math.atan2(currentMapY - startY, currentMapX - startX);
-                        float angleNew = (float) Math.atan2(finalCorrectedMapY - startY, finalCorrectedMapX - startX);
-                        float deltaAngle = angleNew - angleOld;
+                            // compute delta angle between A->C (old) and A->B (new tapped)
+                            float angleOld = (float) Math.atan2(currentMapY - startY, currentMapX - startX);
+                            float angleNew = (float) Math.atan2(finalCorrectedMapY - startY, finalCorrectedMapX - startX);
+                            float deltaAngle = angleNew - angleOld;
 
-                        // rotate current around A by deltaAngle
-                        float[] rotatedC = rotatePoint(currentMapX, currentMapY, startX, startY, deltaAngle,lastCORDx,lastCORDy);
+                            // rotate current around A by deltaAngle
+                            float[] rotatedC = rotatePoint(currentMapX, currentMapY, startX, startY, deltaAngle, lastCORDx, lastCORDy);
 
-                        // translation so rotatedC lands on B
-                        float deltaTransX = finalCorrectedMapX - rotatedC[0];
-                        float deltaTransY = finalCorrectedMapY - rotatedC[1];
+                            // translation so rotatedC lands on B
+                            float deltaTransX = finalCorrectedMapX - rotatedC[0];
+                            float deltaTransY = finalCorrectedMapY - rotatedC[1];
 
-                        // store transform for future points
-                        correctionAngle = deltaAngle;
-                        correctionTransX = deltaTransX;
-                        correctionTransY = deltaTransY;
-                        correctionActive = true;
+                            // store transform for future points
+                            correctionAngle = deltaAngle;
+                            correctionTransX = deltaTransX;
+                            correctionTransY = deltaTransY;
+                            correctionActive = true;
 
-                        // set lastMap to corrected B
-                        lastMapX = finalCorrectedMapX;
-                        lastMapY = finalCorrectedMapY;
+                            // set lastMap to corrected B
+                            lastMapX = finalCorrectedMapX;
+                            lastMapY = finalCorrectedMapY;
 
-                        // update pointer on map (pixel conversion)
-                        float pixelX = (finalCorrectedMapX / mapWidth) * containerWidth;
-                        float pixelY = containerHeight - ((finalCorrectedMapY / mapHeight) * containerHeight);
-                        float adjustedX = pixelX - (pointerSize / 2f);
-                        float adjustedY = pixelY - (pointerSize / 2f);
-                        float clampedX = Math.max(0, Math.min(adjustedX, containerWidth - pointerSize));
-                        float clampedY = Math.max(0, Math.min(adjustedY, containerHeight - pointerSize));
-                        pointerView.setX(clampedX);
-                        pointerView.setY(clampedY);
-                        pointerView.setVisibility(VISIBLE);
+                            // update pointer on map (pixel conversion)
+                            float pixelX = (finalCorrectedMapX / mapWidth) * containerWidth;
+                            float pixelY = containerHeight - ((finalCorrectedMapY / mapHeight) * containerHeight);
+                            float adjustedX = pixelX - (pointerSize / 2f);
+                            float adjustedY = pixelY - (pointerSize / 2f);
+                            float clampedX = Math.max(0, Math.min(adjustedX, containerWidth - pointerSize));
+                            float clampedY = Math.max(0, Math.min(adjustedY, containerHeight - pointerSize));
+                            pointerView.setX(clampedX);
+                            pointerView.setY(clampedY);
+                            pointerView.setVisibility(VISIBLE);
 //                        coordinatesText.setText(String.format(Locale.getDefault(),
 //                                "X: %.2f, Y: %.2f", finalCorrectedMapX, finalCorrectedMapY));
-                        CoordinatesTXT.setText(String.format(Locale.getDefault(),
-                                "%.1f,%.1f", finalCorrectedMapX, finalCorrectedMapY));
-                        // Clear old trail but keep start; then add A->B segment (pixel coords)
-                        if (trailing && trailingLineView != null) {
-                            trailingLineView.clearExceptStart();
-                            float centerX = clampedX + (pointerSize / 2f);
-                            float centerY = clampedY + (pointerSize / 2f);
-                            trailingLineView.addPoint(centerX, centerY);
-                            lastCORDx=centerX;lastCORDy=centerY;
-                            Log.d("KR2","Point Added : "+centerX+","+centerY);
-                        }
+                            CoordinatesTXT.setText(String.format(Locale.getDefault(),
+                                    "%.1f,%.1f", finalCorrectedMapX, finalCorrectedMapY));
+                            // Clear old trail but keep start; then add A->B segment (pixel coords)
+                            if (trailing && trailingLineView != null) {
+                                trailingLineView.clearExceptStart();
+                                float centerX = clampedX + (pointerSize / 2f);
+                                float centerY = clampedY + (pointerSize / 2f);
+                                trailingLineView.addPoint(centerX, centerY);
+                                lastCORDx = centerX;
+                                lastCORDy = centerY;
+                                Log.d("KR2", "Point Added : " + centerX + "," + centerY);
+                            }
 
-                        // exit correction mode
-                        applyPathCorrectionMode = false;
+                            // exit correction mode
+                            applyPathCorrectionMode = false;
 
-                        showMenuLayout();
+                            showMenuLayout();
 //                        ApplyPathCorrection.setVisibility(VISIBLE);
 
-                        Toast.makeText(DisplayMap.this, "Callibration Success", Toast.LENGTH_SHORT).show();
-                    })
-                    .setNegativeButton(getString(R.string.Cancel), (d, w) -> {
+                            Toast.makeText(DisplayMap.this, "Callibration Success", Toast.LENGTH_SHORT).show();
+
+                        })
+                        .setNegativeButton(getString(R.string.No), (d, w) -> {
 //                        applyPathCorrectionMode = false;
 //                        ApplyPathCorrection.setVisibility(VISIBLE);
-                    })
-                    .show();
-        }
-        else
-        {
-            // POSITION CORRECTION (your old behaviour), but also reset any rotation-transform
-            new AlertDialog.Builder(DisplayMap.this)
-                    .setTitle(getString(R.string.Confirm_Correction))
-                    .setMessage(String.format(Locale.getDefault(),
-                            getString(R.string.Set_pointer_to) + " X: %.2f, Y: %.2f?", correctedMapX, correctedMapY))
-                    .setPositiveButton(getString(R.string.Yes), (dialog, which) -> {
-                        com.google.ar.core.Frame frame = null;
-                        if (arFragment != null && arFragment.getArSceneView() != null) {
-                            frame = arFragment.getArSceneView().getArFrame();
-                        }
-                        if (frame != null) {
-                            Pose cameraPose = frame.getCamera().getPose();
-                            float displacementX = cameraPose.tx();
-                            float displacementY = cameraPose.tz();
-                            startX = finalCorrectedMapX - displacementX;
-                            startY = finalCorrectedMapY + displacementY;
-                        } else {
-                            // fallback: set start to tapped point (conservative)
-                            startX = finalCorrectedMapX;
-                            startY = finalCorrectedMapY;
-                        }
+                        })
+                        .show();
+            }
+            else {
+                new AlertDialog.Builder(DisplayMap.this)
+                        .setTitle(getString(R.string.Confirm_Correction))
+                        .setMessage(String.format(Locale.getDefault(),
+                                getString(R.string.Set_pointer_to) + " X: %.2f, Y: %.2f?", correctedMapX, correctedMapY))
+                        .setPositiveButton(getString(R.string.Yes), (dialog, which) -> {
+                            // move pointer instantly and add trail
+                            movePointerToMapCoords(finalCorrectedMapX, finalCorrectedMapY, true);
 
-                        // Reset any active path-rotation transform because this is a position correction
-//                        correctionActive = false;
-//                        correctionAngle = 0f;
-//                        correctionTransX = 0f;
-//                        correctionTransY = 0f;
+                            // Build a simple programmatic dialog view (no new XML required)
+                            Context ctx = DisplayMap.this;
+                            LinearLayout layout = new LinearLayout(ctx);
+                            layout.setOrientation(LinearLayout.VERTICAL);
+                            int padding = (int) (16 * ctx.getResources().getDisplayMetrics().density);
+                            layout.setPadding(padding, padding, padding, padding);
 
-                        lastMapX = finalCorrectedMapX;
-                        lastMapY = finalCorrectedMapY;
-                        CoordinatesTXT.setText(String.format(Locale.getDefault(),
-                                "%.1f,%.1f", finalCorrectedMapX, finalCorrectedMapY));
+                            TextView titleTv = new TextView(ctx);
+                            titleTv.setText("Please wait\nKeep your phone steady");
+                            titleTv.setTextSize(16f);
+                            titleTv.setTypeface(null, Typeface.BOLD);
+                            titleTv.setGravity(Gravity.CENTER);
+                            LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            titleLp.setMargins(0, 0, 0, padding/2);
+                            layout.addView(titleTv, titleLp);
 
-                        float pixelX = (finalCorrectedMapX / mapWidth) * containerWidth;
-                        float pixelY = containerHeight - ((finalCorrectedMapY / mapHeight) * containerHeight);
-                        float adjustedX = pixelX - (pointerSize / 2f);
-                        float adjustedY = pixelY - (pointerSize / 2f);
-                        float clampedX = Math.max(0, Math.min(adjustedX, containerWidth - pointerSize));
-                        float clampedY = Math.max(0, Math.min(adjustedY, containerHeight - pointerSize));
+                            TextView countdownTv = new TextView(ctx);
+                            countdownTv.setTextSize(28f);
+                            countdownTv.setTypeface(null, Typeface.BOLD);
+                            countdownTv.setGravity(Gravity.CENTER);
+                            countdownTv.setText(String.format(Locale.getDefault(), "%.2f", 2.00f));
+                            LinearLayout.LayoutParams countLp = new LinearLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            countLp.setMargins(0, 0, 0, padding/2);
+                            layout.addView(countdownTv, countLp);
 
-                        pointerView.setX(clampedX);
-                        pointerView.setY(clampedY);
-                        pointerView.setVisibility(VISIBLE);
+                            // Use a horizontal determinate ProgressBar (fills over 2000ms).
+                            // If you prefer a circular spinner, swap to new ProgressBar(ctx) without setting determinate.
+                            ProgressBar progressBar = new ProgressBar(ctx, null, android.R.attr.progressBarStyleHorizontal);
+                            progressBar.setIndeterminate(false);
+                            progressBar.setMax(2000); // milliseconds
+                            progressBar.setProgress(0);
+                            LinearLayout.LayoutParams progLp = new LinearLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT, (int) (8 * ctx.getResources().getDisplayMetrics().density));
+                            layout.addView(progressBar, progLp);
 
-                        if (trailing && trailingLineView != null) {
-//                            trailingLineView.clearExceptStart();
-                            float centerX = clampedX + (pointerSize / 2f);
-                            float centerY = clampedY + (pointerSize / 2f);
-                            trailingLineView.addPoint(centerX, centerY);
-                            lastCORDx=centerX;lastCORDy=centerY;
-                            startX = finalCorrectedMapX;
-                            startY = finalCorrectedMapY;
+                            AlertDialog waitingDialog = new AlertDialog.Builder(ctx)
+                                    .setView(layout)
+                                    .setCancelable(false)
+                                    .create();
 
-                            Log.d("KR2_L","Point Added : "+centerX+","+centerY);
-                            crtptAdded=true;
-                            correctionPointerCount=20;
-                        }
+                            // Show the dialog
+                            waitingDialog.show();
 
-//                        correctionActive = false;
-//                        correctionAngle = 0f;
-//                        correctionTransX = 0f;
-//                        correctionTransY = 0f;
-                    })
-                    .setNegativeButton(getString(R.string.Cancel), null)
-                    .show();
+                            // Start a 2 second countdown, update text and progress
+                            final long totalMs = 2000L;
+                            new CountDownTimer(totalMs, 50) { // tick every 50ms for smoothness
+                                @Override
+                                public void onTick(long millisUntilFinished) {
+                                    long elapsed = totalMs - millisUntilFinished;
+                                    // update progress (elapsed)
+                                    progressBar.setProgress((int) elapsed);
+                                    // show remaining in seconds with 2 decimals like "2.00", "1.95", etc.
+                                    float remainingSec = millisUntilFinished / 1000f;
+                                    countdownTv.setText(String.format(Locale.getDefault(), "%.2f", remainingSec));
+                                }
+
+                                @Override
+                                public void onFinish() {
+                                    // finish progress and dismiss
+                                    progressBar.setProgress((int) totalMs);
+                                    countdownTv.setText(String.format(Locale.getDefault(), "%.2f", 0.00f));
+                                    try {
+                                        waitingDialog.dismiss();
+                                    } catch (Exception ignore) {}
+                                    // Optional: any post-wait action can go here
+                                }
+                            }.start();
+                        })
+
+                        .setNegativeButton(getString(R.string.Cancel), null)
+                        .show();
+            }
+//        {
+//            // POSITION CORRECTION (your old behaviour), but also reset any rotation-transform
+//            new AlertDialog.Builder(DisplayMap.this)
+//                    .setTitle(getString(R.string.Confirm_Correction))
+//                    .setMessage(String.format(Locale.getDefault(),
+//                            getString(R.string.Set_pointer_to) + " X: %.2f, Y: %.2f?", correctedMapX, correctedMapY))
+//                    .setPositiveButton(getString(R.string.Yes), (dialog, which) -> {
+//                        com.google.ar.core.Frame frame = null;
+//                        if (arFragment != null && arFragment.getArSceneView() != null) {
+//                            frame = arFragment.getArSceneView().getArFrame();
+//                        }
+//                        if (frame != null) {
+//                            Pose cameraPose = frame.getCamera().getPose();
+//                            float displacementX = cameraPose.tx();
+//                            float displacementY = cameraPose.tz();
+//                            startX = finalCorrectedMapX - displacementX;
+//                            startY = finalCorrectedMapY + displacementY;
+//                        } else {
+//                            // fallback: set start to tapped point (conservative)
+//                            startX = finalCorrectedMapX;
+//                            startY = finalCorrectedMapY;
+//                        }
+//
+//                        // Reset any active path-rotation transform because this is a position correction
+////                        correctionActive = false;
+////                        correctionAngle = 0f;
+////                        correctionTransX = 0f;
+////                        correctionTransY = 0f;
+//
+//                        lastMapX = finalCorrectedMapX;
+//                        lastMapY = finalCorrectedMapY;
+//                        CoordinatesTXT.setText(String.format(Locale.getDefault(),
+//                                "%.1f,%.1f", finalCorrectedMapX, finalCorrectedMapY));
+//
+//                        float pixelX = (finalCorrectedMapX / mapWidth) * containerWidth;
+//                        float pixelY = containerHeight - ((finalCorrectedMapY / mapHeight) * containerHeight);
+//                        float adjustedX = pixelX - (pointerSize / 2f);
+//                        float adjustedY = pixelY - (pointerSize / 2f);
+//                        float clampedX = Math.max(0, Math.min(adjustedX, containerWidth - pointerSize));
+//                        float clampedY = Math.max(0, Math.min(adjustedY, containerHeight - pointerSize));
+//
+//                        pointerView.setX(clampedX);
+//                        pointerView.setY(clampedY);
+//                        pointerView.setVisibility(VISIBLE);
+//
+//                        if (trailing && trailingLineView != null) {
+////                            trailingLineView.clearExceptStart();
+//                            float centerX = clampedX + (pointerSize / 2f);
+//                            float centerY = clampedY + (pointerSize / 2f);
+//                            trailingLineView.addPoint(centerX, centerY);
+//                            lastCORDx=centerX;lastCORDy=centerY;
+//                            startX = finalCorrectedMapX;
+//                            startY = finalCorrectedMapY;
+//
+//                            Log.d("KR2_L","Point Added : "+centerX+","+centerY);
+//                            crtptAdded=true;
+//                            correctionPointerCount=CPC_THRESH;
+//                        }
+//
+////                        correctionActive = false;
+////                        correctionAngle = 0f;
+////                        correctionTransX = 0f;
+////                        correctionTransY = 0f;
+//                    })
+//                    .setNegativeButton(getString(R.string.Cancel), null)
+//                    .show();
+//        }
         }
     }
+
+    /**
+     * Move pointer to given map coordinates (map units). Optionally add a visible trail segment
+     * from the previous pointer center to the new pointer center.
+     */
+    private void movePointerToMapCoords(float mapX, float mapY, boolean addTrail) {
+        // clamp to map bounds
+        float clampedMapX = Math.max(0f, Math.min(mapX, mapWidth));
+        float clampedMapY = Math.max(0f, Math.min(mapY, mapHeight));
+
+        // Attempt to align AR origin so next AR frame's rawMap becomes the tapped coords.
+        // Also if correctionActive is true, recompute correctionTrans so:
+        // rotate(rawMap) + correctionTrans == clampedMap  (immediately)
+        try {
+            com.google.ar.core.Frame frame = null;
+            if (arFragment != null && arFragment.getArSceneView() != null) {
+                frame = arFragment.getArSceneView().getArFrame();
+            }
+
+            if (frame != null) {
+                Pose cameraPose = frame.getCamera().getPose();
+                float displacementX = cameraPose.tx();
+                float displacementY = cameraPose.tz();
+
+                // Rebase startX/startY so rawMap (start + disp) would equal clampedMap if unrotated.
+                startX = clampedMapX - displacementX;
+                startY = clampedMapY + displacementY;
+
+                // If a correction rotation is active, adjust correctionTrans so rotation+trans maps rawMap -> clampedMap
+                if (correctionActive) {
+                    // compute the rawMap for this frame (should be clampedMap logically but rotation will change it)
+                    float rawMapX = startX + displacementX;
+                    float rawMapY = startY - displacementY;
+
+                    // rotate rawMap around start by correctionAngle
+                    // reuse your rotatePoint method which rotates (x,y) about (cx,cy) by angle
+                    float[] rotated = rotatePoint(rawMapX, rawMapY, startX, startY, correctionAngle, 0f, 0f);
+
+                    // set correction translation so rotated + trans == desired clamped coords
+                    correctionTransX = clampedMapX - rotated[0];
+                    correctionTransY = clampedMapY - rotated[1];
+
+                    // ensure correction is applied immediately (your onUpdateFrame has logic checking crtptAdded/correctionPointerCount)
+                    crtptAdded = false;
+                    correctionPointerCount = 0;
+
+                    Log.d(TAG, "Kept correctionActive. New correctionTransX,Y = " + correctionTransX + "," + correctionTransY
+                            + " for angle(deg)=" + Math.toDegrees(correctionAngle));
+                }
+
+                // Optional: detach existing anchors to "clean" AR state while keeping correction transform
+                try {
+                    com.google.ar.core.Session session = arFragment.getArSceneView().getSession();
+                    if (session != null) {
+                        for (com.google.ar.core.Anchor a : session.getAllAnchors()) {
+                            try {
+                                a.detach();
+                            } catch (Exception ex) {
+                                Log.w(TAG, "detach anchor failed: " + ex.getMessage());
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.w(TAG, "Failed to clear anchors: " + e.getMessage());
+                }
+
+            } else {
+                // fallback if AR frame not available
+                startX = clampedMapX;
+                startY = clampedMapY;
+
+                // If correctionActive but we cannot compute rotated raw from a frame, keep correctionActive
+                // and *do not* change correctionTrans here — leaving it as-is will cause the next AR frame (when available)
+                // to be reconciled by the computation above.
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Error aligning AR/correction; fallback to direct start point. " + e.getMessage());
+            startX = clampedMapX;
+            startY = clampedMapY;
+        }
+
+        // store previous center (pixel) before moving
+        int containerWidth = mapView.getWidth();
+        int containerHeight = mapView.getHeight();
+        if (containerWidth == 0 || containerHeight == 0) return;
+
+        float prevCenterX, prevCenterY;
+        if (lastCORDx != 0 || lastCORDy != 0) {
+            prevCenterX = lastCORDx;
+            prevCenterY = lastCORDy;
+        } else {
+            // compute from current pointer view
+            prevCenterX = pointerView.getX() + (pointerSize / 2f);
+            prevCenterY = pointerView.getY() + (pointerSize / 2f);
+        }
+
+        // compute new pointer pixel center
+        float pixelX = (clampedMapX / mapWidth) * containerWidth;
+        float pixelY = containerHeight - ((clampedMapY / mapHeight) * containerHeight);
+        float adjustedX = pixelX - (pointerSize / 2f);
+        float adjustedY = pixelY - (pointerSize / 2f);
+        float clampedX = Math.max(0, Math.min(adjustedX, containerWidth - pointerSize));
+        float clampedY = Math.max(0, Math.min(adjustedY, containerHeight - pointerSize));
+
+        // update logical map coordinates
+        lastMapX = clampedMapX;
+        lastMapY = clampedMapY;
+
+        // update pointer view position (instant)
+        pointerView.setX(clampedX);
+        pointerView.setY(clampedY);
+        pointerView.setVisibility(View.VISIBLE);
+
+        // update displayed coords text
+        showx = clampedMapX;
+        showy = clampedMapY;
+        CoordinatesTXT.setText(String.format(Locale.getDefault(), "%.1f,%.1f", showx, showy));
+
+        // add trail (if requested)
+        if (addTrail && trailing && trailingLineView != null) {
+            // Ensure previous center is added first so the line connects
+            trailingLineView.addPoint(prevCenterX, prevCenterY);
+            float centerX = clampedX + (pointerSize / 2f);
+            float centerY = clampedY + (pointerSize / 2f);
+            trailingLineView.addPoint(centerX, centerY);
+
+            // store last center for next segment
+            lastCORDx = centerX;
+            lastCORDy = centerY;
+            Log.d(TAG, "Trail segment added: from (" + prevCenterX + "," + prevCenterY + ") to (" + centerX + "," + centerY + ")");
+        } else {
+            // still update last center coords so future taps connect properly
+            lastCORDx = clampedX + (pointerSize / 2f);
+            lastCORDy = clampedY + (pointerSize / 2f);
+        }
     }
+
 
     @Override
     public void onZoomOrPan() {
@@ -596,7 +832,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
     private void updateMetricsUI() {
         runOnUiThread(() -> {
             if (stepsTXT == null) return;
-            int steps = stepCounterManager.getSessionSteps();
+            int steps =  stepCounterManager.getSessionSteps();
             float distance = stepCounterManager.getDistanceMeters();
             STEPS = steps;
             Log.d("KR", "Steps : " + STEPS);
@@ -607,7 +843,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             if (pathLayout != null && pathLayout.getVisibility() == View.VISIBLE) {
                 stepProgress.setMax(15);
                 stepProgress.setProgress(steps);
-                stepCountText.setText("Steps\n\n"+steps);
+                stepCountText.setText("Steps\n\n" + steps);
 
                 if (steps >= 15) {
 
@@ -674,17 +910,21 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         float correctedX = rawMapX;
         float correctedY = rawMapY;
 
-         if (correctionActive) {
-             if(!crtptAdded){
-                 float[] rotated = rotatePoint(rawMapX, rawMapY, startX, startY, correctionAngle, lastCORDx, lastCORDy);
-                 correctedX = rotated[0] + correctionTransX;
-                 correctedY = rotated[1] + correctionTransY;
-             }
-             if(correctionPointerCount<1) {
-                 crtptAdded=false;
-             }
-             correctionPointerCount--;
-
+        if (correctionActive) {
+            if (!crtptAdded) {
+                float[] rotated = rotatePoint(rawMapX, rawMapY, startX, startY, correctionAngle, lastCORDx, lastCORDy);
+                correctedX = rotated[0] + correctionTransX;
+                correctedY = rotated[1] + correctionTransY;
+                Log.d("KR@", "correctionMode True : core");
+            } else if (correctionPointerCount < 1) {
+                crtptAdded = false;
+                Log.d("KR@", "correctionMode False");
+            } else {
+                correctionPointerCount--;
+                Log.d("KR@", "correction Point decresed correctionPointerCount : " + correctionPointerCount);
+                correctedX = rawMapX;
+                correctedY = rawMapY;
+            }
         }
         Log.d("KR", "rawMapX: " + rawMapX + " rawMapY: " + rawMapY + " Corrected X and Y : " + correctedX + " , " + correctedY + " Correction Angle :" + correctionAngle);
         // Use corrected coords from here onward (important!)
@@ -732,8 +972,9 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
             float centerX = clampedX + (pointerSize / 2f);
             float centerY = clampedY + (pointerSize / 2f);
             trailingLineView.addPoint(centerX, centerY);
-            lastCORDx=centerX;lastCORDy=centerY;
-            Log.d("KR2","Point Added : "+centerX+","+centerY);
+            lastCORDx = centerX;
+            lastCORDy = centerY;
+            Log.d("KR2", "Point Added : " + centerX + "," + centerY);
         }
     }
 
@@ -775,7 +1016,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
         }
     }
 
-//    private void updatePhotosMetadata(String photoFileName, float x, float y, float origMapWidth, float origMapHeight) {
+    //    private void updatePhotosMetadata(String photoFileName, float x, float y, float origMapWidth, float origMapHeight) {
 //        try {
 //            File jsonFile = new File(mapFolder, "photos.json");
 //            JSONArray jsonArray = new JSONArray();
@@ -798,84 +1039,84 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
 //            Log.e(TAG, "Error updating metadata", e);
 //        }
 //    }
-private void updatePhotosMetadata(String photoFileName, float x, float y, float origMapWidth, float origMapHeight) {
-    try {
-        File jsonFile = new File(mapFolder, "photos.json");
-        JSONArray jsonArray;
+    private void updatePhotosMetadata(String photoFileName, float x, float y, float origMapWidth, float origMapHeight) {
+        try {
+            File jsonFile = new File(mapFolder, "photos.json");
+            JSONArray jsonArray;
 
-        // Read existing array if file exists and is non-empty
-        if (jsonFile.exists()) {
-            StringBuilder sb = new StringBuilder();
-            try (FileInputStream fis = new FileInputStream(jsonFile)) {
-                int ch;
-                while ((ch = fis.read()) != -1) {
-                    sb.append((char) ch);
+            // Read existing array if file exists and is non-empty
+            if (jsonFile.exists()) {
+                StringBuilder sb = new StringBuilder();
+                try (FileInputStream fis = new FileInputStream(jsonFile)) {
+                    int ch;
+                    while ((ch = fis.read()) != -1) {
+                        sb.append((char) ch);
+                    }
+                } catch (IOException readEx) {
+                    Log.e(TAG, "Error reading photos.json, will recreate. " + readEx.getMessage(), readEx);
+                    sb.setLength(0); // treat as empty
                 }
-            } catch (IOException readEx) {
-                Log.e(TAG, "Error reading photos.json, will recreate. " + readEx.getMessage(), readEx);
-                sb.setLength(0); // treat as empty
-            }
 
-            String content = sb.toString().trim();
-            if (!content.isEmpty()) {
-                try {
-                    jsonArray = new JSONArray(content);
-                } catch (Exception parseEx) {
-                    // If parsing fails, log and start a fresh array (prevents crash on corrupted file)
-                    Log.e(TAG, "photos.json parse error, creating new array. " + parseEx.getMessage(), parseEx);
+                String content = sb.toString().trim();
+                if (!content.isEmpty()) {
+                    try {
+                        jsonArray = new JSONArray(content);
+                    } catch (Exception parseEx) {
+                        // If parsing fails, log and start a fresh array (prevents crash on corrupted file)
+                        Log.e(TAG, "photos.json parse error, creating new array. " + parseEx.getMessage(), parseEx);
+                        jsonArray = new JSONArray();
+                    }
+                } else {
                     jsonArray = new JSONArray();
                 }
             } else {
                 jsonArray = new JSONArray();
             }
-        } else {
-            jsonArray = new JSONArray();
-        }
 
-        // Build new entry
-        JSONObject newEntry = new JSONObject();
-        newEntry.put("mapX", x);
-        newEntry.put("mapY", y);
-        newEntry.put("cameraPhoto", photoFileName);
-        newEntry.put("mapWidth", origMapWidth);
-        newEntry.put("mapHeight", origMapHeight);
-        newEntry.put("timestamp", System.currentTimeMillis());
+            // Build new entry
+            JSONObject newEntry = new JSONObject();
+            newEntry.put("mapX", x);
+            newEntry.put("mapY", y);
+            newEntry.put("cameraPhoto", photoFileName);
+            newEntry.put("mapWidth", origMapWidth);
+            newEntry.put("mapHeight", origMapHeight);
+            newEntry.put("timestamp", System.currentTimeMillis());
 
-        // Append and write back
-        jsonArray.put(newEntry);
+            // Append and write back
+            jsonArray.put(newEntry);
 
-        // Write to a temp file then rename (safer)
-        File tmpFile = new File(mapFolder, "photos_tmp.json");
-        try (FileOutputStream fos = new FileOutputStream(tmpFile)) {
-            fos.write(jsonArray.toString(2).getBytes()); // pretty-print with indent 2
-            fos.getFD().sync();
-        }
-        // replace original
-        if (jsonFile.exists()) {
-            if (!jsonFile.delete()) {
-                Log.w(TAG, "Failed to delete old photos.json");
+            // Write to a temp file then rename (safer)
+            File tmpFile = new File(mapFolder, "photos_tmp.json");
+            try (FileOutputStream fos = new FileOutputStream(tmpFile)) {
+                fos.write(jsonArray.toString(2).getBytes()); // pretty-print with indent 2
+                fos.getFD().sync();
             }
-        }
-        if (!tmpFile.renameTo(jsonFile)) {
-            // fallback: try to copy
-            try (FileInputStream fis = new FileInputStream(tmpFile);
-                 FileOutputStream fos2 = new FileOutputStream(jsonFile)) {
-                byte[] buf = new byte[4096];
-                int len;
-                while ((len = fis.read(buf)) > 0) {
-                    fos2.write(buf, 0, len);
+            // replace original
+            if (jsonFile.exists()) {
+                if (!jsonFile.delete()) {
+                    Log.w(TAG, "Failed to delete old photos.json");
                 }
             }
-            tmpFile.delete();
+            if (!tmpFile.renameTo(jsonFile)) {
+                // fallback: try to copy
+                try (FileInputStream fis = new FileInputStream(tmpFile);
+                     FileOutputStream fos2 = new FileOutputStream(jsonFile)) {
+                    byte[] buf = new byte[4096];
+                    int len;
+                    while ((len = fis.read(buf)) > 0) {
+                        fos2.write(buf, 0, len);
+                    }
+                }
+                tmpFile.delete();
+            }
+
+            Log.d(TAG, "photos.json updated, total entries = " + jsonArray.length());
+            addStaticMarker();
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating photos metadata", e);
         }
-
-        Log.d(TAG, "photos.json updated, total entries = " + jsonArray.length());
-        addStaticMarker();
-
-    } catch (Exception e) {
-        Log.e(TAG, "Error updating photos metadata", e);
     }
-}
 
     private void addStaticMarker() {
         runOnUiThread(() -> {

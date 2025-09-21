@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="start"
                 android:paddingBottom="2dp"
-                android:text="Welcome Back"
+                android:text="Welcome"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold" />

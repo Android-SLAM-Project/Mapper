@@ -117,8 +117,19 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
+
         android:padding="24dp"
         android:background="@color/white">
+        <TextView
+            android:id="@+id/skipPathCalibration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Skip Path Calibration"
+            android:textSize="8sp"
+            android:clickable="true"
+            android:layout_gravity="end"
+            android:textColor="#555"
+            android:layout_marginBottom="0dp"/>
         <TextView
             android:id="@+id/titleText2"
             android:layout_width="wrap_content"
@@ -166,67 +177,67 @@
                 android:textColor="#00838F"/>
         </FrameLayout>
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/main_menu"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
+        android:layout_height="match_parent"
         android:background="@color/white"
-        android:gravity="center_horizontal">
+        android:gravity="bottom|center"
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:padding="10dp"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp">
+            android:layout_marginBottom="4dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp">
 
             <!-- X Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_margin="8dp"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="true"
+                android:layout_weight="1"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="6dp"
-                >
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="center"
+                    android:orientation="vertical"
                     android:padding="12dp">
 
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
+                        android:contentDescription=""
                         android:src="@drawable/new_map"
-                        app:tint="?attr/colorPrimary"
-                        android:contentDescription=""/>
+                        app:tint="?attr/colorPrimary" />
 
                     <TextView
                         android:id="@+id/xTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Coordinates"
+                        android:layout_marginTop="4dp"
                         android:singleLine="true"
-                        android:textSize="11sp"
-                        android:layout_marginTop="4dp"/>
+                        android:text="Coordinates"
+                        android:textSize="11sp" />
 
                     <TextView
                         android:id="@+id/CoordinatesTXT"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0.0"
+                        android:layout_marginTop="4dp"
                         android:singleLine="true"
-                        android:textSize="11sp"
-                        android:layout_marginTop="4dp"/>
+                        android:text="0.0"
+                        android:textSize="11sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -234,46 +245,46 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.8"
                 android:layout_margin="8dp"
+                android:layout_weight="0.8"
 
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="true"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="6dp"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true"
 
                 >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="center"
+                    android:orientation="vertical"
                     android:padding="12dp">
 
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        app:tint="?attr/colorPrimary"
-                        android:src="@drawable/foot" />
+                        android:src="@drawable/foot"
+                        app:tint="?attr/colorPrimary" />
 
                     <TextView
                         android:id="@+id/yTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Steps"
+                        android:layout_marginTop="4dp"
                         android:singleLine="true"
-                        android:textSize="11sp"
-                        android:layout_marginTop="4dp"/>
+                        android:text="Steps"
+                        android:textSize="11sp" />
 
                     <TextView
                         android:id="@+id/steps_TXT"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        android:layout_marginTop="4dp"
                         android:singleLine="true"
-                        android:textSize="11sp"
-                        android:layout_marginTop="4dp"/>
+                        android:text="0"
+                        android:textSize="11sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -281,45 +292,45 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.9"
                 android:layout_margin="8dp"
+                android:layout_weight="0.9"
 
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="true"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="6dp">
+                app:cardElevation="6dp"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="center"
+                    android:orientation="vertical"
                     android:padding="12dp">
 
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
+                        android:contentDescription=""
                         android:src="@drawable/distance"
-                        app:tint="?attr/colorPrimary"
-                        android:contentDescription=""/>
+                        app:tint="?attr/colorPrimary" />
 
                     <TextView
                         android:id="@+id/stepsTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Distance"
+                        android:layout_marginTop="4dp"
                         android:singleLine="true"
-                        android:textSize="11sp"
-                        android:layout_marginTop="4dp"/>
+                        android:text="Distance"
+                        android:textSize="11sp" />
 
                     <TextView
                         android:id="@+id/distanceTXT"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 m"
+                        android:layout_marginTop="4dp"
                         android:singleLine="true"
-                        android:textSize="11sp"
-                        android:layout_marginTop="4dp"/>
+                        android:text="0 m"
+                        android:textSize="11sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -327,150 +338,153 @@
 
 
         <!-- Coordinates row -->
-<!--        <LinearLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:gravity="center"-->
-<!--            android:layout_marginTop="24dp"-->
-<!--            android:layout_marginBottom="24dp">-->
+        <!--        <LinearLayout-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:orientation="horizontal"-->
+        <!--            android:gravity="center"-->
+        <!--            android:layout_marginTop="24dp"-->
+        <!--            android:layout_marginBottom="24dp">-->
 
-<!--            <TextView-->
-<!--                android:id="@+id/coordinates"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/coordinates"-->
-<!--                android:textSize="16sp" />-->
+        <!--            <TextView-->
+        <!--                android:id="@+id/coordinates"-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:text="@string/coordinates"-->
+        <!--                android:textSize="16sp" />-->
 
-<!--            <TextView-->
-<!--                android:id="@+id/stepsDistanceTextView"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="16dp"-->
-<!--                android:text="@string/Total_Distance"-->
-<!--                android:textSize="16sp" />-->
-<!--        </LinearLayout>-->
+        <!--            <TextView-->
+        <!--                android:id="@+id/stepsDistanceTextView"-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_marginStart="16dp"-->
+        <!--                android:text="@string/Total_Distance"-->
+        <!--                android:textSize="16sp" />-->
+        <!--        </LinearLayout>-->
 
         <!-- Buttons row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/resetZoom_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.8"
-                android:visibility="gone"
                 android:layout_margin="8dp"
-                app:cardBackgroundColor="?attr/colorPrimary"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="true"
-                app:cardCornerRadius="16dp"
+                android:layout_weight="0.8"
                 android:clickable="true"
-                app:cardElevation="6dp">
+                android:visibility="gone"
+                app:cardBackgroundColor="?attr/colorPrimary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="center"
+                    android:orientation="vertical"
                     android:padding="12dp">
 
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:src="@drawable/zoom_reset"
                         android:contentDescription=""
+                        android:src="@drawable/zoom_reset"
                         app:tint="@color/colorOnPrimary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/Reset_Zoom"
+                        android:layout_marginTop="4dp"
                         android:singleLine="true"
-                        android:textSize="11sp"
+                        android:text="@string/Reset_Zoom"
                         android:textColor="@color/colorOnPrimary"
-                        android:layout_marginTop="4dp"/>
+                        android:textSize="11sp" />
 
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/AddPhoto_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_margin="8dp"
-                app:cardBackgroundColor="?attr/colorPrimary"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="true"
-                app:cardCornerRadius="16dp"
+                android:layout_weight="1"
                 android:clickable="true"
-                app:cardElevation="6dp">
+                app:cardBackgroundColor="?attr/colorPrimary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="center"
+                    android:orientation="vertical"
                     android:padding="12dp">
 
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:src="@drawable/add_photo"
                         android:contentDescription=""
+                        android:src="@drawable/add_photo"
                         app:tint="@color/colorOnPrimary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Add Photo"
+                        android:layout_marginTop="4dp"
                         android:singleLine="true"
-                        android:textSize="11sp"
+                        android:text="Add Photo"
                         android:textColor="@color/colorOnPrimary"
-                        android:layout_marginTop="4dp"/>
+                        android:textSize="11sp" />
 
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/endMap_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_margin="8dp"
-                app:cardBackgroundColor="?attr/colorPrimary"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="true"
-                app:cardCornerRadius="16dp"
+                android:layout_weight="1"
                 android:clickable="true"
-                app:cardElevation="6dp">
+                app:cardBackgroundColor="?attr/colorPrimary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="center"
+                    android:orientation="vertical"
                     android:padding="12dp">
 
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:src="@drawable/exit"
                         android:contentDescription=""
+                        android:src="@drawable/exit"
                         app:tint="@color/colorOnPrimary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/End_Map"
+                        android:layout_marginTop="4dp"
                         android:singleLine="true"
-                        android:textSize="11sp"
+                        android:text="@string/End_Map"
                         android:textColor="@color/colorOnPrimary"
-                        android:layout_marginTop="4dp"/>
+                        android:textSize="11sp" />
 
 
                 </LinearLayout>
