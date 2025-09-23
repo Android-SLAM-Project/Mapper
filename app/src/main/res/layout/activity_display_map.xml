@@ -134,7 +134,7 @@
             android:id="@+id/titleText2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calibrating Path"
+            android:text="Direction Confirmation"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#222"

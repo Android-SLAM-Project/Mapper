@@ -386,8 +386,7 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
                 // PATH (rotation) CORRECTION
                 new AlertDialog.Builder(DisplayMap.this)
                         .setTitle(getString(R.string.apply_path_correction))
-                        .setMessage(String.format(Locale.getDefault(),
-                                getString(R.string.apply_path_calibration_prompt), finalCorrectedMapX, finalCorrectedMapY))
+                        .setMessage(getString(R.string.apply_path_calibration_prompt))
                         .setPositiveButton(getString(R.string.Yes), (dialog, which) -> {
 
                             // Prefer raw current map point from AR frame (so we compute deltaAngle from raw values)
@@ -466,6 +465,13 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
 
                         })
                         .setNegativeButton(getString(R.string.No), (d, w) -> {
+                            applyPathCorrectionMode = false;
+                            correctionAngle = 0;
+                            correctionTransX = 0;
+                            correctionTransY = 0;
+                            correctionActive =false;
+                            showMenuLayout();
+                            Toast.makeText(DisplayMap.this, "Callibration Success", Toast.LENGTH_SHORT).show();
 //                        applyPathCorrectionMode = false;
 //                        ApplyPathCorrection.setVisibility(VISIBLE);
                         })
@@ -1210,7 +1216,9 @@ public class DisplayMap extends AppCompatActivity implements ZoomPanLayout.OnMap
     @Override
     public void onBackPressed() {
         if (sensorTimer != null) sensorTimer.cancel();
+        
         confirmExit();
+
     }
 
     private void startSensorCalibration() {

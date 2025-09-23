@@ -76,11 +76,11 @@
         <string name="Invalid_map_parameters">Invalid map parameters</string>
         <string name="OK">OK</string>
     <string name="Potrait_mode">Potrait Mode</string>
-    <string name="apply_path_correction">Apply Path Calibration</string>
-    <string name="click_on_map_for_path_correction">Click on Map to apply path Calibration</string>
-    <string name="apply_path_calibration_prompt">Apply path calibration to X: %.2f, Y: %.2f ?</string>
-
-
+    <string name="apply_path_correction">Direction Confirmation</string>
+    <string name="click_on_map_for_path_correction">Click on Map to Confirm Direction</string>
+    <string name="apply_path_calibration_prompt">Select No If the direction and path are correct, Direction correction will not be applied\nSelect Yes if the direction and path are incorrect, Direction correction will be applied</string>
+    <string name="Invalid_number">Invalid Number</string>
+    <string name="Invalid_map_dimensions_must_be_positive">Map Dimensions Must be Positive</string>
 
 
 </resources>

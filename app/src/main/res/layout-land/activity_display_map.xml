@@ -126,9 +126,19 @@
                 android:orientation="vertical"
                 android:gravity="center"
                 android:padding="24dp"
-                android:visibility="gone"
-                android:background="#F5F5F5">
 
+                android:background="#F5F5F5">
+                <TextView
+                    android:id="@+id/skipPathCalibration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Skip Path Calibration"
+                    android:textSize="8sp"
+                    android:clickable="true"
+                    android:layout_gravity="end"
+                    android:textColor="#555"
+                    android:visibility="gone"
+                    android:layout_marginBottom="3dp"/>
                 <TextView
                     android:id="@+id/titleText2"
                     android:layout_width="wrap_content"
@@ -183,7 +193,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:gravity="center">
 
                 <!-- X Card -->

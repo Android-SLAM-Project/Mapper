@@ -162,8 +162,8 @@ public class NewMap extends Fragment {
 //                                    ImportMapImage.setVisibility(GONE);
 //                                    loadPreviousMapButton.setVisibility(GONE);
 
-                                    Toast.makeText(getContext(),
-                                          getString(  R.string.Image_loaded_successfully), Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(getContext(),
+//                                          getString(  R.string.Image_loaded_successfully), Toast.LENGTH_SHORT).show();
                                 }
                             } else {
                                 Toast.makeText(getContext(),
@@ -178,43 +178,74 @@ public class NewMap extends Fragment {
         );
 
         ToMapStart.setOnClickListener(__ -> {
-            if (ImageSelected
-                    && !MapHeight.getText().toString().isEmpty()
-                    && !MapWidth.getText().toString().isEmpty()) {
+            // clear previous errors
+            MapHeight.setError(null);
+            MapWidth.setError(null);
 
-                Bundle args = new Bundle();
-                args.putString("imageUri", ImageUri.toString());
-                args.putString("mapHeight", MapHeight.getText().toString());
-                args.putString("mapWidth", MapWidth.getText().toString());
-
-                PreprocessMap frag = new PreprocessMap();
-                frag.setArguments(args);
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.container, frag)
-                        .addToBackStack(null)
-                        .commit();
-
-            } else {
-                StringBuilder msg = new StringBuilder(getString(R.string.Please) + " ");
-
-                if (!ImageSelected) {
-                    msg.append(getString(R.string.Select_an_image)).append(" ");
-                }
-
-                if (MapHeight.getText().toString().isEmpty()) {
-                    if (!ImageSelected) msg.append(getString(R.string.And)).append(" ");
-                    msg.append(getString(R.string.Enter_map_height)).append(" ");
-                }
-
-                if (MapWidth.getText().toString().isEmpty()) {
-                    if (!ImageSelected || MapHeight.getText().toString().isEmpty()) {
-                        msg.append(getString(R.string.And)).append(" ");
-                    }
-                    msg.append(getString(R.string.Enter_map_width));
-                }
-
-                Toast.makeText(getContext(), msg.toString(), Toast.LENGTH_SHORT).show();
+            // check image picked
+            if (!ImageSelected) {
+                Toast.makeText(getContext(), getString(R.string.Select_an_image), Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            String hStr = MapHeight.getText().toString().trim();
+            String wStr = MapWidth.getText().toString().trim();
+
+            // check empty
+            if (hStr.isEmpty()) {
+                MapHeight.setError(getString(R.string.Enter_map_height));
+//                Toast.makeText(getContext(), getString(R.string.Enter_map_height), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (wStr.isEmpty()) {
+                MapWidth.setError(getString(R.string.Enter_map_width));
+//                Toast.makeText(getContext(), getString(R.string.Enter_map_width), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // parse numbers defensively
+            double hVal;
+            double wVal;
+            try {
+                hVal = Double.parseDouble(hStr);
+            } catch (NumberFormatException e) {
+                MapHeight.setError(getString(R.string.Invalid_number));
+//                Toast.makeText(getContext(), getString(R.string.Invalid_number) + ": " + getString(R.string.height), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            try {
+                wVal = Double.parseDouble(wStr);
+            } catch (NumberFormatException e) {
+                MapWidth.setError(getString(R.string.Invalid_number));
+//                Toast.makeText(getContext(), getString(R.string.Invalid_number) + ": " + getString(R.string.width), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // check positive and non-zero
+            if (hVal <= 0) {
+                MapHeight.setError(getString(R.string.Invalid_map_dimensions_must_be_positive));
+//                Toast.makeText(getContext(), getString(R.string.Invalid_map_dimensions_must_be_positive), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (wVal <= 0) {
+                MapWidth.setError(getString(R.string.Invalid_map_dimensions_must_be_positive));
+//                Toast.makeText(getContext(), getString(R.string.Invalid_map_dimensions_must_be_positive), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // passed validation -> proceed
+            Bundle args = new Bundle();
+            args.putString("imageUri", ImageUri.toString());
+            // keep same formatting you used before
+            args.putString("mapHeight", String.valueOf(hVal));
+            args.putString("mapWidth", String.valueOf(wVal));
+
+            PreprocessMap frag = new PreprocessMap();
+            frag.setArguments(args);
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.container, frag)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         return v;
